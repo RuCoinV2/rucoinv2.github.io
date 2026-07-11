@@ -1133,11 +1133,13 @@
 
       contract: "0x5cd963dE59Bd5399AC6CE7a4eB3D4dc8a73bCFd9",
       quoteToken: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+      pairAddress: "0x55AB79065C70DAEd7D241E1D5a8FA88074E139a5",
 
       quickswap: "https://dapp.quickswap.exchange/swap?type=v3&from=0xc2132D05D31c914a87C6611C10748AEb04B58e8F&to=0x5cd963dE59Bd5399AC6CE7a4eB3D4dc8a73bCFd9",
       poolPosition: "https://dapp.quickswap.exchange/pool/positions?version=v3&id=193109",
       polygonscan: "https://polygonscan.com/token/0x5cd963dE59Bd5399AC6CE7a4eB3D4dc8a73bCFd9",
-      marketApi: "https://api.dexscreener.com/token-pairs/v1/polygon/0x5cd963dE59Bd5399AC6CE7a4eB3D4dc8a73bCFd9",
+      dexScreenerApi: "https://api.dexscreener.com/latest/dex/pairs/polygon/0x55AB79065C70DAEd7D241E1D5a8FA88074E139a5",
+      geckoTerminalApi: "https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x55AB79065C70DAEd7D241E1D5a8FA88074E139a5",
 
       telegram: "#",
       twitter: "#",
@@ -1253,7 +1255,7 @@
 
     function applyConfig() {
       $("#contractText").textContent = PROJECT_CONFIG.contract;
-      $("#poolText").textContent = currentLang === "ru" ? "Определяется автоматически…" : "Detected automatically…";
+      $("#poolText").textContent = PROJECT_CONFIG.pairAddress;
       $("#statTargetValue").textContent = `${PROJECT_CONFIG.targetPrice.toFixed(2)} USDT`;
 
       const links = {
@@ -1295,47 +1297,29 @@
       }).format(value);
     }
 
-    function chooseOfficialPair(pairs) {
-      const contract = PROJECT_CONFIG.contract.toLowerCase();
-      const quote = PROJECT_CONFIG.quoteToken.toLowerCase();
-      const matchesTokens = (pair) => {
-        const base = String(pair?.baseToken?.address || "").toLowerCase();
-        const quoted = String(pair?.quoteToken?.address || "").toLowerCase();
-        return (base === contract && quoted === quote) || (base === quote && quoted === contract);
-      };
-      const liquidity = (pair) => Number(pair?.liquidity?.usd || 0);
-      const sorted = [...pairs].sort((a, b) => liquidity(b) - liquidity(a));
-      return sorted.find((pair) => matchesTokens(pair) && String(pair.dexId || "").toLowerCase().includes("quickswap") && Array.isArray(pair.labels) && pair.labels.some((label) => String(label).toLowerCase().includes("v3")))
-        || sorted.find((pair) => matchesTokens(pair) && String(pair.dexId || "").toLowerCase().includes("quickswap"))
-        || sorted.find(matchesTokens)
-        || null;
-    }
+    function renderMarket(data) {
+      if (!data) return;
 
-    function getRusPrice(pair) {
-      const contract = PROJECT_CONFIG.contract.toLowerCase();
-      const base = String(pair?.baseToken?.address || "").toLowerCase();
-      const quote = String(pair?.quoteToken?.address || "").toLowerCase();
-      const priceUsd = Number(pair?.priceUsd);
-      const priceNative = Number(pair?.priceNative);
-      if (base === contract) return priceUsd;
-      if (quote === contract && priceNative > 0) return Number.isFinite(priceUsd) && priceUsd > 0 ? priceUsd / priceNative : 1 / priceNative;
-      return NaN;
-    }
+      latestMarket = data;
+      const price = Number(data.price);
+      const liquidity = Number(data.liquidity);
+      const volume24h = Number(data.volume24h);
 
-    function renderMarket(pair) {
-      if (!pair) return;
-      latestMarket = pair;
-      const price = getRusPrice(pair);
-      const liquidity = Number(pair?.liquidity?.usd);
-      const volume24h = Number(pair?.volume?.h24);
-      const pairAddress = String(pair?.pairAddress || "");
       $("#badgePrice").textContent = formatPrice(price);
       $("#statCurrentPriceValue").textContent = formatPrice(price);
       $("#statLiquidityValue").textContent = formatUsd(liquidity);
       $("#statVolumeValue").textContent = formatUsd(volume24h);
-      if (pairAddress) $("#poolText").textContent = pairAddress;
-      const time = new Date().toLocaleTimeString(currentLang === "ru" ? "ru-RU" : "en-US", { hour: "2-digit", minute: "2-digit" });
-      $("#marketStatus").textContent = currentLang === "ru" ? `Данные DEX обновлены в ${time}. Следующее обновление через 60 секунд.` : `DEX data updated at ${time}. Next update in 60 seconds.`;
+      $("#poolText").textContent = PROJECT_CONFIG.pairAddress;
+
+      const time = new Date().toLocaleTimeString(
+        currentLang === "ru" ? "ru-RU" : "en-US",
+        { hour: "2-digit", minute: "2-digit" }
+      );
+
+      const sourceName = data.source || "DEX";
+      $("#marketStatus").textContent = currentLang === "ru"
+        ? `Данные ${sourceName} обновлены в ${time}. Следующее обновление через 60 секунд.`
+        : `${sourceName} data updated at ${time}. Next update in 60 seconds.`;
     }
 
     function showMarketError() {
@@ -1343,18 +1327,105 @@
       $("#statCurrentPriceValue").textContent = "—";
       $("#statLiquidityValue").textContent = "—";
       $("#statVolumeValue").textContent = "—";
-      $("#marketStatus").textContent = currentLang === "ru" ? "Рыночные данные временно недоступны. Сайт повторит запрос автоматически." : "Market data is temporarily unavailable. The website will retry automatically.";
+      $("#marketStatus").textContent = currentLang === "ru" ? "Не удалось получить данные из двух источников. Сайт повторит запрос автоматически через 60 секунд." : "Both market-data sources are temporarily unavailable. The website will retry in 60 seconds.";
+    }
+
+    async function fetchJson(url, timeoutMs = 10000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(url, {
+          cache: "no-store",
+          headers: { "Accept": "application/json" },
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return await response.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function loadFromDexScreener() {
+      const payload = await fetchJson(PROJECT_CONFIG.dexScreenerApi);
+      const pair = Array.isArray(payload?.pairs) ? payload.pairs[0] : null;
+
+      if (!pair) {
+        throw new Error("DEX Screener did not return the official pool");
+      }
+
+      const baseAddress = String(pair?.baseToken?.address || "").toLowerCase();
+      const rusAddress = PROJECT_CONFIG.contract.toLowerCase();
+
+      let price = Number(pair?.priceUsd);
+
+      // Normally RUS is the base token. Keep a safe conversion if the order changes.
+      if (baseAddress !== rusAddress) {
+        const nativePrice = Number(pair?.priceNative);
+        if (nativePrice > 0 && Number.isFinite(price)) {
+          price = price / nativePrice;
+        }
+      }
+
+      const liquidity = Number(pair?.liquidity?.usd);
+      const volume24h = Number(pair?.volume?.h24 || 0);
+
+      if (!Number.isFinite(price) || !Number.isFinite(liquidity)) {
+        throw new Error("Incomplete DEX Screener response");
+      }
+
+      return {
+        price,
+        liquidity,
+        volume24h: Number.isFinite(volume24h) ? volume24h : 0,
+        source: "DEX Screener"
+      };
+    }
+
+    async function loadFromGeckoTerminal() {
+      const payload = await fetchJson(PROJECT_CONFIG.geckoTerminalApi);
+      const attributes = payload?.data?.attributes;
+
+      if (!attributes) {
+        throw new Error("GeckoTerminal did not return pool data");
+      }
+
+      const price = Number(attributes.base_token_price_usd);
+      const liquidity = Number(attributes.reserve_in_usd);
+      const volume24h = Number(attributes?.volume_usd?.h24 || 0);
+
+      if (!Number.isFinite(price) || !Number.isFinite(liquidity)) {
+        throw new Error("Incomplete GeckoTerminal response");
+      }
+
+      return {
+        price,
+        liquidity,
+        volume24h: Number.isFinite(volume24h) ? volume24h : 0,
+        source: "GeckoTerminal"
+      };
     }
 
     async function updateMarketData() {
+      $("#marketStatus").textContent = currentLang === "ru"
+        ? "Обновление рыночных данных…"
+        : "Updating market data…";
+
       try {
-        const response = await fetch(PROJECT_CONFIG.marketApi, { cache: "no-store" });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const payload = await response.json();
-        const pairs = Array.isArray(payload) ? payload : Array.isArray(payload?.pairs) ? payload.pairs : [];
-        const pair = chooseOfficialPair(pairs);
-        if (!pair) throw new Error("Official RUS/USDT QuickSwap pool not found");
-        renderMarket(pair);
+        let data;
+
+        try {
+          data = await loadFromDexScreener();
+        } catch (dexError) {
+          console.warn("DEX Screener request failed, using GeckoTerminal:", dexError);
+          data = await loadFromGeckoTerminal();
+        }
+
+        renderMarket(data);
       } catch (error) {
         console.error("RuCoin market-data update failed:", error);
         showMarketError();
@@ -1376,7 +1447,7 @@
       if (latestMarket) {
         renderMarket(latestMarket);
       } else {
-        $("#poolText").textContent = lang === "ru" ? "Определяется автоматически…" : "Detected automatically…";
+        $("#poolText").textContent = PROJECT_CONFIG.pairAddress;
         $("#marketStatus").textContent = lang === "ru" ? "Загрузка данных QuickSwap…" : "Loading QuickSwap data…";
       }
     }
