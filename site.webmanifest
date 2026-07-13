@@ -1,0 +1,20 @@
+{
+  "name": "RuCoin Official",
+  "short_name": "RuCoin",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071A16",
+  "theme_color": "#071A16",
+  "icons": [
+    {
+      "src": "/assets/rucoin-logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/rucoin-logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
