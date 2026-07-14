@@ -2,8 +2,6 @@
 
 <html lang="ru">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Курс RuCoin сегодня — официальный сайт RUS</title>
 <meta content="Официальный сайт RuCoin (RUS) в сети Polygon: актуальный курс к USDT и рублю, онлайн-конвертер, график, ликвидность, объём торгов и проверенный адрес контракта." name="description"/>
 <meta content="#071A16" name="theme-color"/>
@@ -766,14 +764,74 @@
       .footer-grid { grid-template-columns: 1fr; }
     }
   
-.course-section{padding-top:82px}.course-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px;margin-top:38px}.converter-card,.chart-card{border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.018));padding:26px;box-shadow:var(--shadow)}.verified-line{display:flex;align-items:center;gap:10px;color:#BEEBDD;font-size:13px;font-weight:750;margin-bottom:24px}.verified-line img{width:32px;height:32px;border-radius:8px}.converter-label{display:block;color:var(--muted);font-size:13px;margin-bottom:9px}.amount-field{display:grid;grid-template-columns:1fr auto;align-items:center;border:1px solid rgba(255,255,255,.16);border-radius:16px;background:rgba(0,0,0,.12);overflow:hidden}.amount-field input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:30px;padding:18px}.amount-field span{padding:0 18px;color:var(--gold-light);font-weight:800}.conversion-result{display:flex;align-items:baseline;justify-content:space-between;margin-top:14px;padding:17px 18px;border-radius:15px;background:rgba(14,107,85,.22);border:1px solid rgba(255,255,255,.07)}.conversion-result span{font-size:28px;font-weight:800}.conversion-result small{color:#BEEBDD;font-weight:750}.conversion-result.secondary{background:rgba(201,163,78,.075)}.conversion-result.secondary small{color:var(--gold-light)}.rate-row,.updated-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;color:var(--muted);font-size:13px}.rate-row strong{color:var(--text)}.chart-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.chart-head strong{display:block;font-size:18px}.chart-head small{display:block;color:var(--muted);margin-top:4px}.chart-head>span{font-weight:800;color:#BEEBDD}.chart-card canvas{width:100%;height:300px;margin-top:18px}.chart-fallback{display:none;color:var(--muted);font-size:14px;padding:36px 0;text-align:center}.official-strip{display:grid;grid-template-columns:1fr minmax(260px,auto) auto;gap:18px;align-items:center;margin-top:18px;padding:20px 22px;border:1px solid rgba(201,163,78,.23);border-radius:18px;background:rgba(201,163,78,.055)}.official-strip strong{display:block}.official-strip p{margin:5px 0 0;color:var(--muted);font-size:14px}.official-strip code{overflow-wrap:anywhere;color:var(--gold-light);font-size:12px}@media(max-width:860px){.course-grid{grid-template-columns:1fr}.official-strip{grid-template-columns:1fr}.chart-card canvas{height:240px}}@media(max-width:520px){.converter-card,.chart-card{padding:19px}.conversion-result span{font-size:24px}.amount-field input{font-size:26px}.official-strip{padding:18px}}
+
+.course-section{padding-top:82px}
+.course-grid{display:grid;grid-template-columns:minmax(310px,.78fr) minmax(0,1.22fr);gap:18px;margin-top:38px;align-items:start}
+.converter-card,.chart-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.018));box-shadow:var(--shadow)}
+.converter-card{padding:26px}
+.verified-line{display:flex;align-items:center;gap:10px;color:#BEEBDD;font-size:13px;font-weight:750;margin-bottom:24px}
+.verified-line img{width:32px;height:32px;border-radius:8px}
+.converter-label{display:block;color:var(--muted);font-size:13px;margin-bottom:9px}
+.amount-field{display:grid;grid-template-columns:1fr auto;align-items:center;border:1px solid rgba(255,255,255,.16);border-radius:16px;background:rgba(0,0,0,.12);overflow:hidden}
+.amount-field input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:30px;padding:18px}
+.amount-field span{padding:0 18px;color:var(--gold-light);font-weight:800}
+.conversion-result{display:flex;align-items:baseline;justify-content:space-between;margin-top:14px;padding:17px 18px;border-radius:15px;background:rgba(14,107,85,.22);border:1px solid rgba(255,255,255,.07)}
+.conversion-result span{font-size:28px;font-weight:800}
+.conversion-result small{color:#BEEBDD;font-weight:750}
+.conversion-result.secondary{background:rgba(201,163,78,.075)}
+.conversion-result.secondary small{color:var(--gold-light)}
+.rate-row,.updated-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;color:var(--muted);font-size:13px}
+.rate-row strong{color:var(--text)}
+
+.chart-card{overflow:hidden;padding:0}
+.chart-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:23px 24px 0}
+.chart-symbol{display:flex;align-items:center;gap:11px;min-width:0}
+.chart-symbol img{width:38px;height:38px;border-radius:11px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.chart-symbol strong{display:block;font-size:19px;letter-spacing:-.02em}
+.chart-symbol small{display:block;margin-top:2px;color:var(--muted);font-size:12px}
+.chart-live{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid rgba(88,207,157,.2);border-radius:999px;background:rgba(40,174,119,.08);color:#9CE1C2;font-size:11px;font-weight:850;letter-spacing:.08em}
+.chart-live::before{content:"";width:7px;height:7px;border-radius:50%;background:#38C986;box-shadow:0 0 0 5px rgba(56,201,134,.11);animation:livePulse 1.8s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.42}}
+.chart-quote{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:20px 24px 0}
+.chart-price{display:flex;align-items:baseline;gap:8px;min-width:0}
+.chart-price strong{font-size:clamp(29px,4vw,40px);line-height:1;font-weight:820;letter-spacing:-.04em;white-space:nowrap}
+.chart-price small{color:var(--muted);font-size:12px;font-weight:750}
+.chart-change{text-align:right}
+.chart-change strong{display:block;font-size:19px;font-weight:820}
+.chart-change small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.chart-periods{display:flex;flex-wrap:wrap;gap:8px;padding:18px 24px 0}
+.chart-period-btn{min-height:36px;padding:0 15px;border-radius:999px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.035);color:var(--muted);cursor:pointer;font-weight:780;font-size:13px;transition:.18s ease}
+.chart-period-btn:hover{color:var(--text);border-color:rgba(255,255,255,.23);transform:translateY(-1px)}
+.chart-period-btn.active{background:var(--gold);border-color:var(--gold);color:#13211D;box-shadow:0 8px 22px rgba(201,163,78,.18)}
+.chart-surface{--plot-left:16px;--plot-right:72px;position:relative;height:410px;margin:17px 18px 0;border-radius:18px;background:#F8FAF9;border:1px solid #D7E0DC;overflow:hidden;box-shadow:0 12px 34px rgba(0,0,0,.17),inset 0 1px 0 rgba(255,255,255,.9)}
+.chart-card canvas{display:block;width:100%;height:100%;touch-action:none}
+.chart-x-axis{position:absolute;left:var(--plot-left);right:var(--plot-right);bottom:7px;height:21px;color:#66756F;font-size:10px;font-weight:650;pointer-events:none}
+.chart-x-axis span{position:absolute;top:0;white-space:nowrap;transform:translateX(-50%)}
+.chart-x-axis span:first-child{transform:none}
+.chart-x-axis span:last-child{transform:translateX(-100%)}
+.chart-tooltip{position:absolute;display:none;pointer-events:none;min-width:158px;padding:10px 12px;border-radius:11px;background:rgba(8,27,22,.95);color:#EAF2EF;font-size:12px;line-height:1.45;box-shadow:0 10px 32px rgba(0,0,0,.28);transform:translate(-50%,-112%);z-index:5;border:1px solid rgba(255,255,255,.1)}
+.chart-tooltip strong{display:block;color:#F1D58E;font-size:13px;margin-bottom:2px}
+.chart-tooltip span{display:block;color:#B9C8C3}
+.chart-crosshair-v,.chart-crosshair-h{position:absolute;display:none;pointer-events:none;z-index:3}
+.chart-crosshair-v{width:1px;top:16px;bottom:38px;background:rgba(40,62,55,.28)}
+.chart-crosshair-h{height:1px;left:16px;right:72px;background:rgba(40,62,55,.18)}
+.chart-crosshair-dot{position:absolute;display:none;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#fff;border:2px solid #0E8B62;box-shadow:0 0 0 3px rgba(14,139,98,.16);pointer-events:none;z-index:4}
+.chart-price-badge{position:absolute;display:none;right:6px;min-width:61px;padding:4px 6px;border-radius:6px;background:#0E6B55;color:#fff;font-size:10px;font-weight:800;text-align:center;transform:translateY(-50%);box-shadow:0 4px 12px rgba(0,0,0,.18);z-index:4}
+.chart-fallback{display:none;position:absolute;inset:0;place-items:center;padding:40px;color:#5F706A;font-size:14px;text-align:center;background:#F8FAF9;z-index:8}
+.chart-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:13px 18px 0}
+.chart-metric{min-width:0;padding:11px 12px;border-radius:13px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+.chart-metric small{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}
+.chart-metric strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.chart-source{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 19px 19px;color:var(--muted);font-size:11px}
+.official-strip{display:grid;grid-template-columns:1fr minmax(260px,auto) auto;gap:18px;align-items:center;margin-top:18px;padding:20px 22px;border:1px solid rgba(201,163,78,.23);border-radius:18px;background:rgba(201,163,78,.055)}
+.official-strip strong{display:block}
+.official-strip p{margin:5px 0 0;color:var(--muted);font-size:14px}
+.official-strip code{overflow-wrap:anywhere;color:var(--gold-light);font-size:12px}
+@media(max-width:920px){.course-grid{grid-template-columns:1fr}.official-strip{grid-template-columns:1fr}.chart-surface{height:390px}}
+@media(max-width:560px){.converter-card{padding:19px}.conversion-result span{font-size:24px}.amount-field input{font-size:26px}.official-strip{padding:18px}.chart-toolbar,.chart-quote{padding-left:17px;padding-right:17px}.chart-periods{padding-left:17px;padding-right:17px}.chart-surface{height:335px;margin-left:10px;margin-right:10px;border-radius:15px}.chart-price strong{font-size:29px}.chart-live{padding:6px 8px}.chart-metrics{grid-template-columns:1fr 1fr;margin-left:10px;margin-right:10px}.chart-source{display:block;padding-left:11px;padding-right:11px}.chart-source span{display:block;margin-top:4px}.chart-x-axis{font-size:9px}.chart-metric strong{font-size:12px}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://rucoinv2.com/#website", "url": "https://rucoinv2.com/", "name": "RuCoin", "alternateName": ["RuCoin Official", "RuCoin RUS", "Официальный сайт RuCoin"], "inLanguage": ["ru", "en"]}, {"@type": "Organization", "@id": "https://rucoinv2.com/#organization", "name": "RuCoin", "url": "https://rucoinv2.com/", "logo": {"@type": "ImageObject", "url": "https://rucoinv2.com/assets/rucoin-logo-512.png", "width": 512, "height": 512}, "sameAs": ["https://t.me/RuCoinV2", "https://polygonscan.com/token/0x5cd963dE59Bd5399AC6CE7a4eB3D4dc8a73bCFd9", "https://dexscreener.com/polygon/0x55ab79065c70daed7d241e1d5a8fa88074e139a5"]}, {"@type": "FinancialProduct", "@id": "https://rucoinv2.com/#token", "name": "RuCoin", "alternateName": "RUS", "description": "Цифровой актив RuCoin (RUS) в сети Polygon.", "url": "https://rucoinv2.com/", "provider": {"@id": "https://rucoinv2.com/#organization"}}]}</script></head>
 <body><noscript><div style="padding:14px;text-align:center;background:#C9A34E;color:#13211D">Для загрузки онлайн-курса RuCoin включите JavaScript.</div></noscript>
-<!--
-    Контракт RuCoin, QuickSwap и автоматическое получение рыночных данных уже настроены.
-    Telegram и X можно добавить позже в объекте PROJECT_CONFIG внизу файла.
-  -->
 <header class="header">
 <div class="container nav" id="nav">
 <a aria-label="RuCoin" class="brand" href="#top">
@@ -862,9 +920,36 @@
 <div class="updated-row"><span id="courseUpdated">Загрузка данных…</span><button class="copy-btn" data-i18n="refresh" id="refreshCourse" type="button">Обновить</button></div>
 </div>
 <div class="chart-card">
-<div class="chart-head"><div><strong data-i18n="priceChart">График RUS/USDT</strong><small data-i18n="last24h">Последние 24 часа</small></div><span id="chartChange">—</span></div>
-<canvas aria-label="График курса RuCoin" height="360" id="priceChartCanvas" width="760"></canvas>
-<div class="chart-fallback" data-i18n="chartFallback" id="chartFallback">История цены появится после загрузки данных GeckoTerminal.</div>
+<div class="chart-toolbar">
+  <div class="chart-symbol"><img alt="RuCoin" src="assets/rucoin-logo-64.png"/><div><strong>RUS / USDT</strong><small>QuickSwap · Polygon</small></div></div>
+  <div class="chart-live">LIVE</div>
+</div>
+<div class="chart-quote">
+  <div class="chart-price"><strong id="chartHeaderPrice">—</strong><small>USDT</small></div>
+  <div class="chart-change"><strong id="chartChange">—</strong><small id="chartPeriodLabel">За 8 часов</small></div>
+</div>
+<div class="chart-periods" aria-label="Период графика">
+  <button class="chart-period-btn active" data-period="8h" type="button">8 ч.</button>
+  <button class="chart-period-btn" data-period="24h" type="button">24 ч.</button>
+  <button class="chart-period-btn" data-period="7d" type="button">7 дней</button>
+</div>
+<div class="chart-surface" id="chartSurface">
+  <canvas aria-label="Биржевой график курса RuCoin" id="priceChartCanvas"></canvas>
+  <div class="chart-x-axis" id="chartXAxis"></div>
+  <div class="chart-crosshair-v" id="chartCrosshairV"></div>
+  <div class="chart-crosshair-h" id="chartCrosshairH"></div>
+  <div class="chart-crosshair-dot" id="chartCrosshairDot"></div>
+  <div class="chart-price-badge" id="chartPriceBadge">—</div>
+  <div class="chart-tooltip" id="chartTooltip"></div>
+  <div class="chart-fallback" data-i18n="chartFallback" id="chartFallback">История цены появится после загрузки данных GeckoTerminal.</div>
+</div>
+<div class="chart-metrics">
+  <div class="chart-metric"><small id="chartMinLabel">Минимум</small><strong id="chartMin">—</strong></div>
+  <div class="chart-metric"><small id="chartMaxLabel">Максимум</small><strong id="chartMax">—</strong></div>
+  <div class="chart-metric"><small id="chartLastLabel">Последняя цена</small><strong id="chartLast">—</strong></div>
+  <div class="chart-metric"><small id="chartVolumeLabel">Объём периода</small><strong id="chartVolume">—</strong></div>
+</div>
+<div class="chart-source"><span id="chartSource">Источник: GeckoTerminal / QuickSwap</span><span id="chartUpdated">—</span></div>
 </div>
 </div>
 <div class="official-strip">
@@ -1150,9 +1235,6 @@
 </footer>
 <div class="notice" data-i18n="copied" id="notice">Скопировано</div>
 <script>
-    /*
-      ЗАМЕНИТЕ ТОЛЬКО ЭТИ ЗНАЧЕНИЯ ПЕРЕД ПУБЛИКАЦИЕЙ.
-    */
     const PROJECT_CONFIG = {
       tokenName: "RuCoin",
       symbol: "RUS",
@@ -1169,10 +1251,10 @@
       geckoTerminalApi: "https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x55AB79065C70DAEd7D241E1D5a8FA88074E139a5",
 
       telegram: "https://t.me/RuCoinV2",
-      twitter: "#",
+      twitter: "",
       refreshMs: 60000,
       usdtRubApi: "https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub",
-      ohlcvApi: "https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x55AB79065C70DAEd7D241E1D5a8FA88074E139a5/ohlcv/minute?aggregate=15&limit=96&currency=usd"
+      ohlcvBase: "https://api.geckoterminal.com/api/v2/networks/polygon_pos/pools/0x55AB79065C70DAEd7D241E1D5a8FA88074E139a5/ohlcv"
     };
 
     const translations = {
@@ -1303,11 +1385,14 @@
       Object.entries(links).forEach(([id, url]) => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.href = configuredLink(url);
-        if (url && url !== "#") {
-          el.target = "_blank";
-          el.rel = "noopener noreferrer";
+        if (!url || url === "#") {
+          el.hidden = true;
+          return;
         }
+        el.hidden = false;
+        el.href = url;
+        el.target = "_blank";
+        el.rel = "noopener noreferrer";
       });
     }
 
@@ -1469,6 +1554,13 @@
 
     let usdtRubRate = null;
     let priceHistory = [];
+    let activeChartPeriod = "8h";
+    let chartGeometry = null;
+    const CHART_PERIODS = {
+      "8h":  { path:"minute", aggregate:15, limit:40, seconds:8*3600, step:3600,  ru:"За 8 часов",  en:"8-hour change" },
+      "24h": { path:"minute", aggregate:30, limit:56, seconds:24*3600, step:4*3600, ru:"За 24 часа", en:"24-hour change" },
+      "7d":  { path:"hour", aggregate:4, limit:48, seconds:7*86400, step:86400, ru:"За 7 дней", en:"7-day change" }
+    };
 
     function updateConverter() {
       const amount = Math.max(0, Number($("#rusAmount")?.value || 0));
@@ -1492,43 +1584,336 @@
       updateConverter();
     }
 
-    async function loadPriceHistory() {
+    async function loadPriceHistory(period = activeChartPeriod) {
       const canvas = $("#priceChartCanvas");
       const fallback = $("#chartFallback");
       if (!canvas) return;
+
+      activeChartPeriod = period;
+      const cfg = CHART_PERIODS[period] || CHART_PERIODS["8h"];
+      const url = `${PROJECT_CONFIG.ohlcvBase}/${cfg.path}?aggregate=${cfg.aggregate}&limit=${cfg.limit}&currency=usd`;
+
+      $$(".chart-period-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.period === activeChartPeriod));
+      if ($("#chartPeriodLabel")) $("#chartPeriodLabel").textContent = currentLang === "ru" ? cfg.ru : cfg.en;
+
       try {
-        const payload = await fetchJson(PROJECT_CONFIG.ohlcvApi, 12000);
+        const payload = await fetchJson(url, 12000);
         const rows = payload?.data?.attributes?.ohlcv_list;
         if (!Array.isArray(rows) || rows.length < 2) throw new Error("OHLCV unavailable");
-        priceHistory = rows.slice().reverse().map(row => ({t:Number(row[0]),p:Number(row[4])})).filter(x=>Number.isFinite(x.p));
+
+        const bucketSeconds = cfg.path === "minute" ? cfg.aggregate * 60 : cfg.aggregate * 3600;
+        const deduplicated = new Map();
+
+        rows.forEach(row => {
+          const rawTimestamp = Number(row[0]);
+          const timestampSeconds = rawTimestamp > 100000000000 ? rawTimestamp / 1000 : rawTimestamp;
+          const bucketTimestamp = Math.floor(timestampSeconds / bucketSeconds) * bucketSeconds;
+          const close = Number(row[4]);
+          const volume = Number(row[5] || 0);
+          if (Number.isFinite(bucketTimestamp) && Number.isFinite(close)) {
+            deduplicated.set(bucketTimestamp, { t: bucketTimestamp, p: close, v: Number.isFinite(volume) ? volume : 0 });
+          }
+        });
+
+        const sorted = [...deduplicated.values()].sort((a, b) => a.t - b.t);
+        if (sorted.length < 2) throw new Error("Not enough OHLCV points");
+
+        const newestTimestamp = sorted[sorted.length - 1].t;
+        const cutoff = newestTimestamp - cfg.seconds - bucketSeconds;
+        priceHistory = sorted.filter(point => point.t >= cutoff);
+        if (priceHistory.length < 2) priceHistory = sorted.slice(-2);
+
         drawPriceChart();
         fallback.style.display = "none";
         canvas.style.display = "block";
+
+        const now = new Date().toLocaleTimeString(currentLang === "ru" ? "ru-RU" : "en-US", {hour:"2-digit",minute:"2-digit"});
+        if ($("#chartUpdated")) $("#chartUpdated").textContent = currentLang === "ru" ? `Обновлено: ${now}` : `Updated: ${now}`;
       } catch (error) {
         console.warn("Price history request failed:", error);
         canvas.style.display = "none";
-        fallback.style.display = "block";
+        fallback.style.display = "grid";
+        chartGeometry = null;
       }
+    }
+
+    function chartPriceNumber(value) {
+      return Number.isFinite(value) ? localNumber(value, value < 1 ? 6 : 4) : "—";
+    }
+
+    function chartPrice(value) {
+      return Number.isFinite(value) ? `${chartPriceNumber(value)} USDT` : "—";
+    }
+
+    function chartTimeLabel(timestamp, compact = false) {
+      const date = new Date(timestamp * 1000);
+      if (activeChartPeriod === "7d") {
+        return date.toLocaleDateString(currentLang === "ru" ? "ru-RU" : "en-US", {day:"2-digit",month:"2-digit"});
+      }
+      if (compact) {
+        return date.toLocaleTimeString(currentLang === "ru" ? "ru-RU" : "en-US", {hour:"2-digit"}).replace(/\D/g, "").slice(0, 2);
+      }
+      return date.toLocaleTimeString(currentLang === "ru" ? "ru-RU" : "en-US", {hour:"2-digit",minute:"2-digit"});
+    }
+
+    function chartDateTimeLabel(timestamp) {
+      const date = new Date(timestamp * 1000);
+      return date.toLocaleString(currentLang === "ru" ? "ru-RU" : "en-US", {
+        day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"
+      });
+    }
+
+    function formatCompactVolume(value) {
+      if (!Number.isFinite(value)) return "—";
+      return new Intl.NumberFormat(currentLang === "ru" ? "ru-RU" : "en-US", {
+        notation:"compact", maximumFractionDigits:2
+      }).format(value);
+    }
+
+    function buildChartRange(lastTimestamp) {
+      const cfg = CHART_PERIODS[activeChartPeriod] || CHART_PERIODS["8h"];
+      const end = Math.ceil(lastTimestamp / cfg.step) * cfg.step;
+      const start = end - cfg.seconds;
+      const tickTimes = [];
+      for (let timestamp = start; timestamp <= end; timestamp += cfg.step) tickTimes.push(timestamp);
+      return { start, end, tickTimes };
+    }
+
+    function renderChartXAxis(tickTimes, start, end, surfaceWidth) {
+      const axis = $("#chartXAxis");
+      if (!axis) return;
+      axis.innerHTML = "";
+      const compact = surfaceWidth < 480 && activeChartPeriod === "8h";
+      tickTimes.forEach((timestamp, index) => {
+        const label = document.createElement("span");
+        label.textContent = chartTimeLabel(timestamp, compact);
+        label.style.left = `${((timestamp - start) / Math.max(1, end - start)) * 100}%`;
+        if (index === 0) label.style.transform = "none";
+        if (index === tickTimes.length - 1) label.style.transform = "translateX(-100%)";
+        axis.appendChild(label);
+      });
     }
 
     function drawPriceChart() {
       const canvas = $("#priceChartCanvas");
-      if (!canvas || priceHistory.length < 2) return;
-      const rect = canvas.getBoundingClientRect();
+      const surface = $("#chartSurface");
+      if (!canvas || !surface || priceHistory.length < 2) return;
+
+      const rect = surface.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.max(320, Math.round(rect.width * dpr));
-      canvas.height = Math.round((rect.height || 300) * dpr);
+      const cssWidth = Math.max(300, rect.width);
+      const cssHeight = Math.max(300, rect.height);
+      canvas.width = Math.round(cssWidth * dpr);
+      canvas.height = Math.round(cssHeight * dpr);
+
       const ctx = canvas.getContext("2d");
-      const w=canvas.width,h=canvas.height,pad=32*dpr;
-      ctx.clearRect(0,0,w,h);
-      const vals=priceHistory.map(x=>x.p), min=Math.min(...vals), max=Math.max(...vals), spread=Math.max(max-min,max*0.002);
-      ctx.strokeStyle="rgba(255,255,255,.10)"; ctx.lineWidth=1*dpr;
-      for(let i=0;i<4;i++){const y=pad+(h-2*pad)*i/3;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-pad,y);ctx.stroke();}
-      const pts=vals.map((v,i)=>({x:pad+(w-2*pad)*i/(vals.length-1),y:h-pad-(h-2*pad)*(v-min+spread*.08)/(spread*1.16)}));
-      const grad=ctx.createLinearGradient(0,pad,0,h-pad);grad.addColorStop(0,"rgba(23,133,107,.35)");grad.addColorStop(1,"rgba(23,133,107,0)");
-      ctx.beginPath();ctx.moveTo(pts[0].x,h-pad);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(pts[pts.length-1].x,h-pad);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
-      ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.strokeStyle="#2BAA87";ctx.lineWidth=3*dpr;ctx.lineJoin="round";ctx.stroke();
-      const change=(vals.at(-1)/vals[0]-1)*100;const el=$("#chartChange");if(el){el.textContent=`${change>=0?"+":""}${localNumber(change,2)}%`;el.style.color=change>=0?"#BEEBDD":"#E1B48D";}
+      const w = canvas.width;
+      const h = canvas.height;
+      const pad = { left: 16*dpr, right: 74*dpr, top: 18*dpr, bottom: 39*dpr };
+      const plotW = w - pad.left - pad.right;
+      const totalPlotH = h - pad.top - pad.bottom;
+      const volumeH = Math.max(35*dpr, totalPlotH * .18);
+      const gapH = 8*dpr;
+      const priceH = totalPlotH - volumeH - gapH;
+
+      surface.style.setProperty("--plot-left", `${pad.left / dpr}px`);
+      surface.style.setProperty("--plot-right", `${pad.right / dpr}px`);
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#F8FAF9";
+      ctx.fillRect(0, 0, w, h);
+
+      const lastTimestamp = priceHistory[priceHistory.length - 1].t;
+      const range = buildChartRange(lastTimestamp);
+      const visiblePoints = priceHistory.filter(point => point.t >= range.start && point.t <= range.end);
+      const points = visiblePoints.length >= 2 ? visiblePoints : priceHistory.slice(-2);
+      const prices = points.map(point => point.p);
+      const volumes = points.map(point => Math.max(0, point.v || 0));
+      const rawMin = Math.min(...prices);
+      const rawMax = Math.max(...prices);
+      const rawSpread = Math.max(rawMax - rawMin, rawMax * .0008, .000001);
+      const min = rawMin - rawSpread * .14;
+      const max = rawMax + rawSpread * .14;
+      const spread = max - min;
+      const maxVolume = Math.max(...volumes, 1);
+
+      const xForTime = timestamp => pad.left + plotW * (timestamp - range.start) / Math.max(1, range.end - range.start);
+      const yForPrice = value => pad.top + priceH * (max - value) / spread;
+      const volumeBase = pad.top + priceH + gapH + volumeH;
+
+      ctx.font = `${(cssWidth < 480 ? 9.5 : 10.5) * dpr}px Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+      ctx.lineWidth = dpr;
+      ctx.textBaseline = "middle";
+
+      // Price grid and right-hand scale.
+      for (let index = 0; index < 5; index++) {
+        const ratio = index / 4;
+        const y = pad.top + priceH * ratio;
+        const value = max - spread * ratio;
+        ctx.strokeStyle = "#DCE5E1";
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(w - pad.right, y);
+        ctx.stroke();
+        ctx.fillStyle = "#5E6D67";
+        ctx.textAlign = "left";
+        ctx.fillText(chartPriceNumber(value), w - pad.right + 9*dpr, y);
+      }
+
+      // Time grid.
+      range.tickTimes.forEach(timestamp => {
+        const x = xForTime(timestamp);
+        ctx.strokeStyle = "#E8EEEB";
+        ctx.beginPath();
+        ctx.moveTo(x, pad.top);
+        ctx.lineTo(x, volumeBase);
+        ctx.stroke();
+      });
+
+      // Separator above volume.
+      ctx.strokeStyle = "#DCE5E1";
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top + priceH + gapH/2);
+      ctx.lineTo(w - pad.right, pad.top + priceH + gapH/2);
+      ctx.stroke();
+
+      const plotted = points.map(point => ({
+        x: xForTime(point.t),
+        y: yForPrice(point.p),
+        t: point.t,
+        p: point.p,
+        v: Math.max(0, point.v || 0)
+      }));
+
+      // Volume bars.
+      const candleSeconds = CHART_PERIODS[activeChartPeriod].path === "minute"
+        ? CHART_PERIODS[activeChartPeriod].aggregate * 60
+        : CHART_PERIODS[activeChartPeriod].aggregate * 3600;
+      const barWidth = Math.max(2*dpr, Math.min(10*dpr, plotW * candleSeconds / Math.max(1, range.end - range.start) * .68));
+      plotted.forEach((point, index) => {
+        const previous = plotted[index - 1];
+        const rising = !previous || point.p >= previous.p;
+        const barHeight = volumeH * (point.v / maxVolume);
+        ctx.fillStyle = rising ? "rgba(21,154,104,.28)" : "rgba(217,75,75,.24)";
+        ctx.fillRect(point.x - barWidth/2, volumeBase - barHeight, barWidth, barHeight);
+      });
+
+      // Soft area under the price line.
+      const areaGradient = ctx.createLinearGradient(0, pad.top, 0, pad.top + priceH);
+      areaGradient.addColorStop(0, "rgba(14,139,98,.12)");
+      areaGradient.addColorStop(1, "rgba(14,139,98,0)");
+      ctx.beginPath();
+      ctx.moveTo(plotted[0].x, pad.top + priceH);
+      plotted.forEach(point => ctx.lineTo(point.x, point.y));
+      ctx.lineTo(plotted[plotted.length - 1].x, pad.top + priceH);
+      ctx.closePath();
+      ctx.fillStyle = areaGradient;
+      ctx.fill();
+
+      // Red/green line segments.
+      ctx.lineWidth = 2.35*dpr;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      for (let index = 1; index < plotted.length; index++) {
+        const previous = plotted[index - 1];
+        const current = plotted[index];
+        ctx.beginPath();
+        ctx.moveTo(previous.x, previous.y);
+        ctx.lineTo(current.x, current.y);
+        ctx.strokeStyle = current.p >= previous.p ? "#0E9B68" : "#D94C4C";
+        ctx.stroke();
+      }
+
+      const firstPrice = prices[0];
+      const lastPrice = prices[prices.length - 1];
+      const change = (lastPrice / firstPrice - 1) * 100;
+      const lastY = yForPrice(lastPrice);
+
+      // Current-price guide.
+      ctx.save();
+      ctx.setLineDash([5*dpr, 4*dpr]);
+      ctx.strokeStyle = change >= 0 ? "rgba(14,139,98,.72)" : "rgba(201,63,63,.72)";
+      ctx.beginPath();
+      ctx.moveTo(pad.left, lastY);
+      ctx.lineTo(w - pad.right, lastY);
+      ctx.stroke();
+      ctx.restore();
+
+      // Last point marker.
+      const lastPoint = plotted[plotted.length - 1];
+      ctx.beginPath();
+      ctx.arc(lastPoint.x, lastPoint.y, 3.2*dpr, 0, Math.PI*2);
+      ctx.fillStyle = change >= 0 ? "#0E9B68" : "#D94C4C";
+      ctx.fill();
+      ctx.lineWidth = 2*dpr;
+      ctx.strokeStyle = "#FFFFFF";
+      ctx.stroke();
+
+      renderChartXAxis(range.tickTimes, range.start, range.end, cssWidth);
+
+      const priceBadge = $("#chartPriceBadge");
+      if (priceBadge) {
+        priceBadge.textContent = chartPriceNumber(lastPrice);
+        priceBadge.style.top = `${lastY / dpr}px`;
+        priceBadge.style.background = change >= 0 ? "#0E6B55" : "#B84444";
+        priceBadge.style.display = "block";
+      }
+
+      const totalVolume = volumes.reduce((sum, value) => sum + value, 0);
+      if ($("#chartHeaderPrice")) $("#chartHeaderPrice").textContent = chartPriceNumber(lastPrice);
+      if ($("#chartChange")) {
+        $("#chartChange").textContent = `${change >= 0 ? "+" : ""}${localNumber(change, 2)}%`;
+        $("#chartChange").style.color = change >= 0 ? "#6DDBAE" : "#F09A9A";
+      }
+      if ($("#chartMin")) $("#chartMin").textContent = chartPrice(rawMin);
+      if ($("#chartMax")) $("#chartMax").textContent = chartPrice(rawMax);
+      if ($("#chartLast")) $("#chartLast").textContent = chartPrice(lastPrice);
+      if ($("#chartVolume")) $("#chartVolume").textContent = `${formatCompactVolume(totalVolume)} USD`;
+
+      chartGeometry = {
+        points: plotted.map(point => ({ x:point.x/dpr, y:point.y/dpr, t:point.t, p:point.p, v:point.v })),
+        plotLeft: pad.left/dpr,
+        plotRight: (w-pad.right)/dpr,
+        priceTop: pad.top/dpr,
+        priceBottom: (pad.top+priceH)/dpr
+      };
+    }
+
+    function hideChartTooltip() {
+      ["#chartTooltip", "#chartCrosshairV", "#chartCrosshairH", "#chartCrosshairDot"].forEach(selector => {
+        const element = $(selector);
+        if (element) element.style.display = "none";
+      });
+    }
+
+    function showChartTooltip(clientX) {
+      const surface = $("#chartSurface");
+      const tooltip = $("#chartTooltip");
+      const vertical = $("#chartCrosshairV");
+      const horizontal = $("#chartCrosshairH");
+      const dot = $("#chartCrosshairDot");
+      if (!surface || !tooltip || !vertical || !horizontal || !dot || !chartGeometry?.points?.length) return;
+
+      const rect = surface.getBoundingClientRect();
+      const localX = Math.max(chartGeometry.plotLeft, Math.min(chartGeometry.plotRight, clientX - rect.left));
+      let nearest = chartGeometry.points[0];
+      chartGeometry.points.forEach(point => {
+        if (Math.abs(point.x - localX) < Math.abs(nearest.x - localX)) nearest = point;
+      });
+
+      tooltip.innerHTML = `<strong>${chartPrice(nearest.p)}</strong><span>${chartDateTimeLabel(nearest.t)}</span><span>${currentLang === "ru" ? "Объём" : "Volume"}: ${formatCompactVolume(nearest.v)} USD</span>`;
+      const safeTooltipX = Math.max(85, Math.min(rect.width - 85, nearest.x));
+      tooltip.style.left = `${safeTooltipX}px`;
+      tooltip.style.top = `${Math.max(70, nearest.y)}px`;
+      tooltip.style.display = "block";
+
+      vertical.style.left = `${nearest.x}px`;
+      vertical.style.display = "block";
+      horizontal.style.top = `${nearest.y}px`;
+      horizontal.style.display = "block";
+      dot.style.left = `${nearest.x}px`;
+      dot.style.top = `${nearest.y}px`;
+      dot.style.display = "block";
     }
 
     function stampCourseUpdate() {
@@ -1545,6 +1930,16 @@
         if (translations[lang][key]) el.textContent = translations[lang][key];
       });
       $("#langBtn").textContent = lang === "ru" ? "EN" : "RU";
+      const periodCfg = CHART_PERIODS[activeChartPeriod] || CHART_PERIODS["8h"];
+      if ($("#chartPeriodLabel")) $("#chartPeriodLabel").textContent = lang === "ru" ? periodCfg.ru : periodCfg.en;
+      if ($("#chartMinLabel")) $("#chartMinLabel").textContent = lang === "ru" ? "Минимум" : "Low";
+      if ($("#chartMaxLabel")) $("#chartMaxLabel").textContent = lang === "ru" ? "Максимум" : "High";
+      if ($("#chartLastLabel")) $("#chartLastLabel").textContent = lang === "ru" ? "Последняя цена" : "Last price";
+      if ($("#chartVolumeLabel")) $("#chartVolumeLabel").textContent = lang === "ru" ? "Объём периода" : "Period volume";
+      if ($("#chartSource")) $("#chartSource").textContent = lang === "ru" ? "Источник: GeckoTerminal / QuickSwap" : "Source: GeckoTerminal / QuickSwap";
+      const periodNames = {"8h":lang === "ru" ? "8 ч." : "8h", "24h":lang === "ru" ? "24 ч." : "24h", "7d":lang === "ru" ? "7 дней" : "7 days"};
+      $$(".chart-period-btn").forEach(button => button.textContent = periodNames[button.dataset.period] || button.textContent);
+      if (priceHistory.length > 1) drawPriceChart();
       document.title = lang === "ru"
         ? "Курс RuCoin сегодня — официальный сайт RUS"
         : "RuCoin price today — official RUS website";
@@ -1598,16 +1993,24 @@
 
 
     if ($("#rusAmount")) $("#rusAmount").addEventListener("input", updateConverter);
-    if ($("#refreshCourse")) $("#refreshCourse").addEventListener("click", async () => { await Promise.allSettled([updateMarketData(), loadUsdtRub(), loadPriceHistory()]); });
-    window.addEventListener("resize", () => { if (priceHistory.length) drawPriceChart(); });
+    if ($("#refreshCourse")) $("#refreshCourse").addEventListener("click", async () => { await Promise.allSettled([updateMarketData(), loadUsdtRub(), loadPriceHistory(activeChartPeriod)]); });
+    $$(".chart-period-btn").forEach(button => button.addEventListener("click", () => loadPriceHistory(button.dataset.period || "8h")));
+    const chartSurface = $("#chartSurface");
+    chartSurface?.addEventListener("pointermove", event => showChartTooltip(event.clientX));
+    chartSurface?.addEventListener("pointerdown", event => showChartTooltip(event.clientX));
+    chartSurface?.addEventListener("pointerleave", hideChartTooltip);
+    chartSurface?.addEventListener("pointercancel", hideChartTooltip);
+    window.addEventListener("resize", () => { hideChartTooltip(); if (priceHistory.length) drawPriceChart(); });
 
     $("#year").textContent = new Date().getFullYear();
     applyConfig();
     setLanguage("ru");
     updateMarketData();
     loadUsdtRub();
-    loadPriceHistory();
+    loadPriceHistory("8h");
     setInterval(updateMarketData, PROJECT_CONFIG.refreshMs);
+    setInterval(() => loadPriceHistory(activeChartPeriod), 5 * 60 * 1000);
+    setInterval(loadUsdtRub, 5 * 60 * 1000);
   </script>
 </body>
 </html>
