@@ -7,7 +7,7 @@
 <meta content="#071A16" name="theme-color"/>
 <meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
 <meta content="strict-origin-when-cross-origin" name="referrer"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://api.coingecko.com; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://api.coingecko.com">
 <link href="https://rucoinv2.com/" rel="canonical"/>
 <link href="/favicon.ico" rel="icon" sizes="any"/>
 <link href="/assets/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
@@ -837,7 +837,7 @@
 <header class="header">
 <div class="container nav" id="nav">
 <a aria-label="RuCoin" class="brand" href="#top">
-<img alt="RuCoin logo" src="assets/logo-mark.png"/>
+<img alt="RuCoin logo" src="/assets/logo-mark.png"/>
 <span>RUCOIN</span>
 </a>
 <nav aria-label="Основное меню" class="nav-links"><a data-i18n="navCourse" href="#course">Курс</a>
@@ -880,7 +880,7 @@
 </div>
 <div aria-label="RuCoin" class="hero-visual">
 <div class="coin-glow"></div>
-<img alt="RuCoin gold emblem" class="hero-logo" src="assets/hero-logo.png"/>
+<img alt="RuCoin gold emblem" class="hero-logo" src="/assets/hero-logo.png"/>
 <div class="mini-badge">
 <small data-i18n="currentPriceLabel">Текущая цена RUS</small>
 <strong id="badgePrice">Загрузка…</strong>
@@ -913,7 +913,7 @@
 <p class="section-intro" data-i18n="courseIntro">Рыночная цена официального пула RUS/USDT на QuickSwap с пересчётом в российские рубли.</p>
 <div class="course-grid">
 <div class="converter-card">
-<div class="verified-line"><img alt="" src="assets/rucoin-logo-64.png"/><span data-i18n="verifiedToken">Официальный RuCoin • Polygon</span></div>
+<div class="verified-line"><img alt="" src="/assets/rucoin-logo-64.png"/><span data-i18n="verifiedToken">Официальный RuCoin • Polygon</span></div>
 <label class="converter-label" data-i18n="amountLabel" for="rusAmount">Количество RuCoin</label>
 <div class="amount-field"><input aria-label="Количество RuCoin" id="rusAmount" inputmode="decimal" min="0" step="any" type="number" value="1"/><span>RUS</span></div>
 <div class="conversion-result"><span id="resultUsdt">—</span><small>USDT</small></div>
@@ -923,7 +923,7 @@
 </div>
 <div class="chart-card">
 <div class="chart-toolbar">
-  <div class="chart-symbol"><img alt="RuCoin" src="assets/rucoin-logo-64.png"/><div><strong>RUS / USDT</strong><small>QuickSwap · Polygon</small></div></div>
+  <div class="chart-symbol"><img alt="RuCoin" src="/assets/rucoin-logo-64.png"/><div><strong>RUS / USDT</strong><small>QuickSwap · Polygon</small></div></div>
   <div class="chart-live">LIVE</div>
 </div>
 <div class="chart-quote">
@@ -1027,7 +1027,7 @@
         </p>
 <div class="transparency-layout">
 <div class="token-icon-wrap">
-<img alt="RuCoin listing icon" class="token-icon" src="assets/rucoin-logo-256.png"/>
+<img alt="RuCoin listing icon" class="token-icon" src="/assets/rucoin-logo-256.png"/>
 </div>
 <div class="details">
 <div class="detail-row">
@@ -1223,7 +1223,7 @@
 <div class="container footer-grid">
 <div>
 <div class="brand" style="margin-bottom:10px">
-<img alt="" src="assets/logo-mark.png"/>
+<img alt="" src="/assets/logo-mark.png"/>
 <span>RUCOIN</span>
 </div>
 <div>© <span id="year"></span> RuCoin. <span data-i18n="footerRights">Все права защищены.</span></div>
@@ -1655,6 +1655,12 @@
     let priceHistory = [];
     let activeChartPeriod = "8h";
     let chartGeometry = null;
+
+    const CHART_CACHE_PREFIX = "rucoin_chart_v4_";
+    const chartMemoryCache = new Map();
+    const chartRequestPromises = new Map();
+    let chartPrefetchStarted = false;
+
     const CHART_PERIODS = {
       "8h":  { path:"minute", aggregate:15, limit:40, seconds:8*3600, step:3600,  ru:"За 8 часов",  en:"8-hour change" },
       "24h": { path:"hour", aggregate:1, limit:30, seconds:24*3600, step:4*3600, ru:"За 24 часа", en:"24-hour change" },
@@ -1694,98 +1700,316 @@
       updateConverter();
     }
 
-    async function loadPriceHistory(period = activeChartPeriod) {
-      const canvas = $("#priceChartCanvas");
-      const fallback = $("#chartFallback");
-      if (!canvas) return;
+    function chartCacheTtl(period) {
+      if (period === "8h") return 3 * 60 * 1000;
+      if (period === "24h") return 5 * 60 * 1000;
+      if (period === "7d") return 15 * 60 * 1000;
+      return 60 * 60 * 1000;
+    }
 
-      activeChartPeriod = period;
-      const cfg = CHART_PERIODS[period] || CHART_PERIODS["8h"];
-      const url = `${PROJECT_CONFIG.ohlcvBase}/${cfg.path}?aggregate=${cfg.aggregate}&limit=${cfg.limit}&currency=usd&include_empty_intervals=true`;
-
-      $$(".chart-period-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.period === activeChartPeriod));
-      if ($("#chartPeriodLabel")) $("#chartPeriodLabel").textContent = currentLang === "ru" ? cfg.ru : cfg.en;
+    function readChartCache(period) {
+      const memoryEntry = chartMemoryCache.get(period);
+      if (memoryEntry?.points?.length >= 2) return memoryEntry;
 
       try {
-        const payload = await fetchJson(url, 12000);
-        const rows = payload?.data?.attributes?.ohlcv_list;
-        if (!Array.isArray(rows)) throw new Error("OHLCV unavailable");
+        const raw = localStorage.getItem(`${CHART_CACHE_PREFIX}${period}`);
+        if (!raw) return null;
 
-        const bucketSeconds = cfg.path === "minute"
-          ? cfg.aggregate * 60
-          : cfg.path === "day"
-            ? cfg.aggregate * 86400
-            : cfg.aggregate * 3600;
-        const deduplicated = new Map();
+        const parsed = JSON.parse(raw);
+        const points = Array.isArray(parsed?.points)
+          ? parsed.points
+              .map(point => ({
+                t: Number(point.t),
+                p: Number(point.p),
+                v: Math.max(0, Number(point.v) || 0),
+                real: Boolean(point.real)
+              }))
+              .filter(point => Number.isFinite(point.t) && Number.isFinite(point.p))
+          : [];
 
-        rows.forEach(row => {
-          const rawTimestamp = Number(row[0]);
-          const timestampSeconds = rawTimestamp > 100000000000 ? rawTimestamp / 1000 : rawTimestamp;
-          const bucketTimestamp = Math.floor(timestampSeconds / bucketSeconds) * bucketSeconds;
-          const close = Number(row[4]);
-          const volume = Number(row[5] || 0);
-          if (Number.isFinite(bucketTimestamp) && Number.isFinite(close)) {
-            deduplicated.set(bucketTimestamp, { t: bucketTimestamp, p: close, v: Number.isFinite(volume) ? volume : 0 });
-          }
-        });
+        if (points.length < 2) return null;
 
-        let sorted = [...deduplicated.values()].sort((a, b) => a.t - b.t);
-        const marketPrice = Number(latestMarket?.price);
+        const entry = {
+          period,
+          savedAt: Number(parsed.savedAt) || 0,
+          points
+        };
 
-        // Build a continuous time series up to the current candle.
-        // Intervals without trades keep the previous close and use zero volume.
-        const currentBucket = Math.floor(Date.now() / 1000 / bucketSeconds) * bucketSeconds;
-        const rangeStart = currentBucket - cfg.seconds;
-
-        // A newly tracked or low-activity pool can legitimately have no candle
-        // in the selected period. In that case show a flat line at the live price.
-        if (!sorted.length && Number.isFinite(marketPrice)) {
-          sorted = [{ t: currentBucket, p: marketPrice, v: 0 }];
-        }
-        if (!sorted.length) throw new Error("Not enough OHLCV points");
-
-        const sourceByTime = new Map(sorted.map(point => [point.t, point]));
-        const pointBeforeRange = [...sorted].reverse().find(point => point.t <= rangeStart);
-        const firstPointInOrAfterRange = sorted.find(point => point.t >= rangeStart);
-
-        let lastKnownPrice =
-          pointBeforeRange?.p ??
-          firstPointInOrAfterRange?.p ??
-          (Number.isFinite(marketPrice) ? marketPrice : sorted[0].p);
-
-        const continuous = [];
-        for (let timestamp = rangeStart; timestamp <= currentBucket; timestamp += bucketSeconds) {
-          const realPoint = sourceByTime.get(timestamp);
-
-          if (realPoint && Number.isFinite(realPoint.p)) {
-            lastKnownPrice = realPoint.p;
-            continuous.push({ t: timestamp, p: lastKnownPrice, v: Math.max(0, realPoint.v || 0), real: true });
-          } else {
-            continuous.push({ t: timestamp, p: lastKnownPrice, v: 0, real: false });
-          }
-        }
-
-        // Keep the final displayed value synchronized with the live pool price.
-        if (continuous.length && Number.isFinite(marketPrice)) {
-          continuous[continuous.length - 1].p = marketPrice;
-        }
-
-        priceHistory = continuous;
-        if (priceHistory.length < 2) throw new Error("Not enough continuous OHLCV points");
-
-        drawPriceChart();
-        fallback.style.display = "none";
-        canvas.style.display = "block";
-
-        const now = new Date().toLocaleTimeString(currentLang === "ru" ? "ru-RU" : "en-US", {hour:"2-digit",minute:"2-digit"});
-        if ($("#chartUpdated")) $("#chartUpdated").textContent = currentLang === "ru" ? `Обновлено: ${now}` : `Updated: ${now}`;
+        chartMemoryCache.set(period, entry);
+        return entry;
       } catch (error) {
-        console.warn("Price history request failed:", error);
-        canvas.style.display = "none";
-        fallback.style.display = "grid";
-        chartGeometry = null;
+        console.warn("Chart cache read failed:", error);
+        return null;
       }
     }
+
+    function writeChartCache(period, points) {
+      const entry = {
+        period,
+        savedAt: Date.now(),
+        points: points.map(point => ({
+          t: Number(point.t),
+          p: Number(point.p),
+          v: Math.max(0, Number(point.v) || 0),
+          real: Boolean(point.real)
+        }))
+      };
+
+      chartMemoryCache.set(period, entry);
+
+      try {
+        localStorage.setItem(`${CHART_CACHE_PREFIX}${period}`, JSON.stringify(entry));
+      } catch (error) {
+        console.warn("Chart cache write failed:", error);
+      }
+
+      return entry;
+    }
+
+    function setChartPeriodUi(period) {
+      activeChartPeriod = period;
+      const cfg = CHART_PERIODS[period] || CHART_PERIODS["8h"];
+
+      $$(".chart-period-btn").forEach(button => {
+        button.classList.toggle("active", button.dataset.period === activeChartPeriod);
+      });
+
+      if ($("#chartPeriodLabel")) {
+        $("#chartPeriodLabel").textContent =
+          currentLang === "ru" ? cfg.ru : cfg.en;
+      }
+    }
+
+    function renderChartEntry(entry, isCached = false) {
+      if (!entry?.points?.length) return false;
+
+      setChartPeriodUi(entry.period);
+      priceHistory = entry.points;
+      drawPriceChart();
+
+      const canvas = $("#priceChartCanvas");
+      const fallback = $("#chartFallback");
+      if (canvas) canvas.style.display = "block";
+      if (fallback) fallback.style.display = "none";
+
+      const updated = $("#chartUpdated");
+      if (updated) {
+        const timestamp = Number(entry.savedAt) || Date.now();
+        const time = new Date(timestamp).toLocaleTimeString(
+          currentLang === "ru" ? "ru-RU" : "en-US",
+          { hour: "2-digit", minute: "2-digit" }
+        );
+
+        updated.textContent = isCached
+          ? (currentLang === "ru" ? `Последние данные: ${time}` : `Last data: ${time}`)
+          : (currentLang === "ru" ? `Обновлено: ${time}` : `Updated: ${time}`);
+      }
+
+      return true;
+    }
+
+    function showChartLoading(period) {
+      setChartPeriodUi(period);
+
+      const canvas = $("#priceChartCanvas");
+      const fallback = $("#chartFallback");
+
+      // Keep the currently rendered chart visible during a background refresh.
+      if (priceHistory.length >= 2 && canvas?.style.display !== "none") return;
+
+      if (canvas) canvas.style.display = "none";
+      if (fallback) {
+        fallback.textContent =
+          currentLang === "ru" ? "Загрузка графика…" : "Loading chart…";
+        fallback.style.display = "grid";
+      }
+    }
+
+    function createContinuousHistory(rows, cfg) {
+      const bucketSeconds = cfg.path === "minute"
+        ? cfg.aggregate * 60
+        : cfg.path === "day"
+          ? cfg.aggregate * 86400
+          : cfg.aggregate * 3600;
+
+      const deduplicated = new Map();
+
+      rows.forEach(row => {
+        const rawTimestamp = Number(row[0]);
+        const timestampSeconds =
+          rawTimestamp > 100000000000 ? rawTimestamp / 1000 : rawTimestamp;
+        const bucketTimestamp =
+          Math.floor(timestampSeconds / bucketSeconds) * bucketSeconds;
+        const close = Number(row[4]);
+        const volume = Number(row[5] || 0);
+
+        if (Number.isFinite(bucketTimestamp) && Number.isFinite(close)) {
+          deduplicated.set(bucketTimestamp, {
+            t: bucketTimestamp,
+            p: close,
+            v: Number.isFinite(volume) ? Math.max(0, volume) : 0
+          });
+        }
+      });
+
+      let sorted = [...deduplicated.values()].sort((a, b) => a.t - b.t);
+      const marketPrice = Number(latestMarket?.price);
+      const currentBucket =
+        Math.floor(Date.now() / 1000 / bucketSeconds) * bucketSeconds;
+      const rangeStart = currentBucket - cfg.seconds;
+
+      if (!sorted.length && Number.isFinite(marketPrice)) {
+        sorted = [{ t: currentBucket, p: marketPrice, v: 0 }];
+      }
+
+      if (!sorted.length) {
+        throw new Error("Not enough OHLCV points");
+      }
+
+      const sourceByTime = new Map(sorted.map(point => [point.t, point]));
+      const pointBeforeRange =
+        [...sorted].reverse().find(point => point.t <= rangeStart);
+      const firstPointInOrAfterRange =
+        sorted.find(point => point.t >= rangeStart);
+
+      let lastKnownPrice =
+        pointBeforeRange?.p ??
+        firstPointInOrAfterRange?.p ??
+        (Number.isFinite(marketPrice) ? marketPrice : sorted[0].p);
+
+      const continuous = [];
+
+      for (
+        let timestamp = rangeStart;
+        timestamp <= currentBucket;
+        timestamp += bucketSeconds
+      ) {
+        const realPoint = sourceByTime.get(timestamp);
+
+        if (realPoint && Number.isFinite(realPoint.p)) {
+          lastKnownPrice = realPoint.p;
+          continuous.push({
+            t: timestamp,
+            p: lastKnownPrice,
+            v: Math.max(0, realPoint.v || 0),
+            real: true
+          });
+        } else {
+          continuous.push({
+            t: timestamp,
+            p: lastKnownPrice,
+            v: 0,
+            real: false
+          });
+        }
+      }
+
+      if (continuous.length && Number.isFinite(marketPrice)) {
+        continuous[continuous.length - 1].p = marketPrice;
+      }
+
+      if (continuous.length < 2) {
+        throw new Error("Not enough continuous OHLCV points");
+      }
+
+      return continuous;
+    }
+
+    async function fetchChartPeriod(period, force = false) {
+      const cached = readChartCache(period);
+      const isFresh =
+        cached && Date.now() - cached.savedAt < chartCacheTtl(period);
+
+      if (isFresh && !force) return cached;
+
+      if (chartRequestPromises.has(period)) {
+        return chartRequestPromises.get(period);
+      }
+
+      const cfg = CHART_PERIODS[period] || CHART_PERIODS["8h"];
+
+      // Missing intervals are filled locally, which keeps this request
+      // compatible with all supported public OHLCV endpoints.
+      const url =
+        `${PROJECT_CONFIG.ohlcvBase}/${cfg.path}` +
+        `?aggregate=${cfg.aggregate}` +
+        `&limit=${cfg.limit}` +
+        `&currency=usd`;
+
+      const requestPromise = (async () => {
+        try {
+          const payload = await fetchJson(url, 7000);
+          const rows = payload?.data?.attributes?.ohlcv_list;
+
+          if (!Array.isArray(rows)) {
+            throw new Error("OHLCV unavailable");
+          }
+
+          const points = createContinuousHistory(rows, cfg);
+          return writeChartCache(period, points);
+        } finally {
+          chartRequestPromises.delete(period);
+        }
+      })();
+
+      chartRequestPromises.set(period, requestPromise);
+      return requestPromise;
+    }
+
+    async function loadPriceHistory(
+      period = activeChartPeriod,
+      { force = false, background = false } = {}
+    ) {
+      const canvas = $("#priceChartCanvas");
+      const fallback = $("#chartFallback");
+      if (!canvas) return null;
+
+      const cached = readChartCache(period);
+
+      if (!background) {
+        if (cached) {
+          renderChartEntry(cached, true);
+        } else {
+          showChartLoading(period);
+        }
+      }
+
+      try {
+        const freshEntry = await fetchChartPeriod(period, force);
+
+        if (!background && activeChartPeriod === period) {
+          renderChartEntry(freshEntry, false);
+        }
+
+        return freshEntry;
+      } catch (error) {
+        console.warn(`Price history request failed for ${period}:`, error);
+
+        if (!background && !cached) {
+          canvas.style.display = "none";
+          fallback.textContent = currentLang === "ru"
+            ? "История цены временно недоступна. Повторите попытку через несколько секунд."
+            : "Price history is temporarily unavailable. Please try again shortly.";
+          fallback.style.display = "grid";
+          chartGeometry = null;
+        }
+
+        if (cached) return cached;
+        throw error;
+      }
+    }
+
+    function startChartPrefetch() {
+      if (chartPrefetchStarted) return;
+      chartPrefetchStarted = true;
+
+      ["24h", "7d", "30d"].forEach((period, index) => {
+        window.setTimeout(() => {
+          fetchChartPeriod(period).catch(() => {});
+        }, 1200 + index * 1800);
+      });
+    }
+
 
     function chartPriceNumber(value) {
       return Number.isFinite(value) ? localNumber(value, value < 1 ? 6 : 4) : "—";
@@ -2179,8 +2403,12 @@
 
 
     if ($("#rusAmount")) $("#rusAmount").addEventListener("input", updateConverter);
-    if ($("#refreshCourse")) $("#refreshCourse").addEventListener("click", async () => { await Promise.allSettled([updateMarketData(), loadUsdtRub(), loadPriceHistory(activeChartPeriod)]); });
-    $$(".chart-period-btn").forEach(button => button.addEventListener("click", () => loadPriceHistory(button.dataset.period || "8h")));
+    if ($("#refreshCourse")) $("#refreshCourse").addEventListener("click", async () => { await Promise.allSettled([updateMarketData(), loadUsdtRub(), loadPriceHistory(activeChartPeriod, { force: true })]); });
+    $$(".chart-period-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        loadPriceHistory(button.dataset.period || "8h").catch(() => {});
+      });
+    });
     const chartSurface = $("#chartSurface");
     chartSurface?.addEventListener("pointermove", event => showChartTooltip(event.clientX));
     chartSurface?.addEventListener("pointerdown", event => showChartTooltip(event.clientX));
@@ -2196,9 +2424,27 @@
     // Fresh requests run in the background. Cached values remain visible.
     updateMarketData().catch(() => {});
     loadUsdtRub();
-    loadPriceHistory("8h");
-    setInterval(() => updateMarketData().catch(() => {}), PROJECT_CONFIG.refreshMs);
-    setInterval(() => loadPriceHistory(activeChartPeriod), 5 * 60 * 1000);
+
+    const cachedInitialChart = readChartCache("8h");
+    if (cachedInitialChart) {
+      renderChartEntry(cachedInitialChart, true);
+    }
+
+    loadPriceHistory("8h")
+      .then(() => startChartPrefetch())
+      .catch(() => startChartPrefetch());
+
+    setInterval(
+      () => updateMarketData().catch(() => {}),
+      PROJECT_CONFIG.refreshMs
+    );
+
+    setInterval(() => {
+      loadPriceHistory(activeChartPeriod, {
+        force: true,
+        background: false
+      }).catch(() => {});
+    }, 5 * 60 * 1000);
     setInterval(loadUsdtRub, 5 * 60 * 1000);
   </script>
 </body>
