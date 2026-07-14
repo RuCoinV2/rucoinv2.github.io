@@ -941,7 +941,7 @@
   <div class="chart-crosshair-dot" id="chartCrosshairDot"></div>
   <div class="chart-price-badge" id="chartPriceBadge">—</div>
   <div class="chart-tooltip" id="chartTooltip"></div>
-  <div class="chart-fallback" data-i18n="chartFallback" id="chartFallback">История цены появится после загрузки данных GeckoTerminal.</div>
+  <div class="chart-fallback" data-i18n="chartFallback" id="chartFallback">Не удалось загрузить историю цены. Повторите попытку через несколько секунд.</div>
 </div>
 <div class="chart-metrics">
   <div class="chart-metric"><small id="chartMinLabel">Минимум</small><strong id="chartMin">—</strong></div>
@@ -949,7 +949,7 @@
   <div class="chart-metric"><small id="chartLastLabel">Последняя цена</small><strong id="chartLast">—</strong></div>
   <div class="chart-metric"><small id="chartVolumeLabel">Объём периода</small><strong id="chartVolume">—</strong></div>
 </div>
-<div class="chart-source"><span id="chartSource">Источник: GeckoTerminal / QuickSwap · пустые интервалы заполнены последней ценой</span><span id="chartUpdated">—</span></div>
+<div class="chart-source"><span id="chartSource">Источник: GeckoTerminal / QuickSwap</span><span id="chartUpdated">—</span></div>
 </div>
 </div>
 <div class="official-strip">
@@ -1260,7 +1260,7 @@
     const translations = {
       ru: {
         navCourse:"Курс", navAbout:"О проекте", navStability:"Стабильность", navTransparency:"Прозрачность", navToken:"Токен", navRoadmap:"План",
-        buyRUS:"Купить RUS", courseKicker:"Онлайн-курс", courseTitle:"Курс RuCoin сегодня", courseIntro:"Рыночная цена официального пула RUS/USDT на QuickSwap с пересчётом в российские рубли.", verifiedToken:"Официальный RuCoin • Polygon", amountLabel:"Количество RuCoin", usdtRubRate:"Курс USDT к рублю", refresh:"Обновить", priceChart:"График RUS/USDT", last24h:"Последние 24 часа", chartFallback:"История цены появится после загрузки данных GeckoTerminal.", officialIdentity:"Как отличить официальный RuCoin", officialIdentityText:"Проверяйте одновременно логотип, сеть Polygon, тикер RUS и адрес контракта.", eyebrow:"Цифровой актив в сети Polygon",
+        buyRUS:"Купить RUS", courseKicker:"Онлайн-курс", courseTitle:"Курс RuCoin сегодня", courseIntro:"Рыночная цена официального пула RUS/USDT на QuickSwap с пересчётом в российские рубли.", verifiedToken:"Официальный RuCoin • Polygon", amountLabel:"Количество RuCoin", usdtRubRate:"Курс USDT к рублю", refresh:"Обновить", priceChart:"График RUS/USDT", last24h:"Последние 24 часа", chartFallback:"Не удалось загрузить историю цены. Повторите попытку через несколько секунд.", officialIdentity:"Как отличить официальный RuCoin", officialIdentityText:"Проверяйте одновременно логотип, сеть Polygon, тикер RUS и адрес контракта.", eyebrow:"Цифровой актив в сети Polygon",
         heroTitleA:"Децентрализованная ценность.", heroTitleB:"Предсказуемая цена.",
         heroLead:"RuCoin — цифровой актив, разработанный для поддержания целевой рыночной цены 0,10 USDT за 1 RUS с помощью прозрачной ликвидности в блокчейне и автоматизированного механизма стабилизации.",
         buyQuickSwap:"Купить на QuickSwap", viewContract:"Открыть контракт",
@@ -1308,7 +1308,7 @@
       },
       en: {
         navCourse:"Price", navAbout:"About", navStability:"Stability", navTransparency:"Transparency", navToken:"Token", navRoadmap:"Roadmap",
-        buyRUS:"Buy RUS", courseKicker:"Live price", courseTitle:"RuCoin price today", courseIntro:"Market price from the official RUS/USDT QuickSwap pool with conversion to Russian rubles.", verifiedToken:"Official RuCoin • Polygon", amountLabel:"RuCoin amount", usdtRubRate:"USDT to RUB rate", refresh:"Refresh", priceChart:"RUS/USDT chart", last24h:"Last 24 hours", chartFallback:"Price history will appear after GeckoTerminal data loads.", officialIdentity:"How to identify official RuCoin", officialIdentityText:"Verify the logo, Polygon network, RUS ticker and contract address together.", eyebrow:"Digital asset on Polygon",
+        buyRUS:"Buy RUS", courseKicker:"Live price", courseTitle:"RuCoin price today", courseIntro:"Market price from the official RUS/USDT QuickSwap pool with conversion to Russian rubles.", verifiedToken:"Official RuCoin • Polygon", amountLabel:"RuCoin amount", usdtRubRate:"USDT to RUB rate", refresh:"Refresh", priceChart:"RUS/USDT chart", last24h:"Last 24 hours", chartFallback:"Price history is temporarily unavailable. Please try again shortly.", officialIdentity:"How to identify official RuCoin", officialIdentityText:"Verify the logo, Polygon network, RUS ticker and contract address together.", eyebrow:"Digital asset on Polygon",
         heroTitleA:"Decentralized value.", heroTitleB:"Predictable price.",
         heroLead:"RuCoin is a digital asset designed to maintain a target market price of 0.10 USDT per RUS through transparent on-chain liquidity and an automated market-stabilization mechanism.",
         buyQuickSwap:"Buy on QuickSwap", viewContract:"View contract",
@@ -1558,7 +1558,7 @@
     let chartGeometry = null;
     const CHART_PERIODS = {
       "8h":  { path:"minute", aggregate:15, limit:40, seconds:8*3600, step:3600,  ru:"За 8 часов",  en:"8-hour change" },
-      "24h": { path:"minute", aggregate:30, limit:56, seconds:24*3600, step:4*3600, ru:"За 24 часа", en:"24-hour change" },
+      "24h": { path:"hour", aggregate:1, limit:30, seconds:24*3600, step:4*3600, ru:"За 24 часа", en:"24-hour change" },
       "7d":  { path:"hour", aggregate:4, limit:48, seconds:7*86400, step:86400, ru:"За 7 дней", en:"7-day change" }
     };
 
@@ -1599,7 +1599,7 @@
       try {
         const payload = await fetchJson(url, 12000);
         const rows = payload?.data?.attributes?.ohlcv_list;
-        if (!Array.isArray(rows) || rows.length < 2) throw new Error("OHLCV unavailable");
+        if (!Array.isArray(rows)) throw new Error("OHLCV unavailable");
 
         const bucketSeconds = cfg.path === "minute" ? cfg.aggregate * 60 : cfg.aggregate * 3600;
         const deduplicated = new Map();
@@ -1615,18 +1615,24 @@
           }
         });
 
-        const sorted = [...deduplicated.values()].sort((a, b) => a.t - b.t);
-        if (!sorted.length) throw new Error("Not enough OHLCV points");
+        let sorted = [...deduplicated.values()].sort((a, b) => a.t - b.t);
+        const marketPrice = Number(latestMarket?.price);
 
         // Build a continuous time series up to the current candle.
         // Intervals without trades keep the previous close and use zero volume.
         const currentBucket = Math.floor(Date.now() / 1000 / bucketSeconds) * bucketSeconds;
         const rangeStart = currentBucket - cfg.seconds;
 
+        // A newly tracked or low-activity pool can legitimately have no candle
+        // in the selected period. In that case show a flat line at the live price.
+        if (!sorted.length && Number.isFinite(marketPrice)) {
+          sorted = [{ t: currentBucket, p: marketPrice, v: 0 }];
+        }
+        if (!sorted.length) throw new Error("Not enough OHLCV points");
+
         const sourceByTime = new Map(sorted.map(point => [point.t, point]));
         const pointBeforeRange = [...sorted].reverse().find(point => point.t <= rangeStart);
         const firstPointInOrAfterRange = sorted.find(point => point.t >= rangeStart);
-        const marketPrice = Number(latestMarket?.price);
 
         let lastKnownPrice =
           pointBeforeRange?.p ??
@@ -1820,14 +1826,20 @@
         ? CHART_PERIODS[activeChartPeriod].aggregate * 60
         : CHART_PERIODS[activeChartPeriod].aggregate * 3600;
       const barWidth = Math.max(2*dpr, Math.min(10*dpr, plotW * candleSeconds / Math.max(1, range.end - range.start) * .68));
+      let volumeDirection = 1;
       plotted.forEach((point, index) => {
         const previous = plotted[index - 1];
-        const delta = previous ? point.p - previous.p : 0;
-        const tolerance = Math.max(Math.abs(previous?.p || point.p) * 1e-10, 1e-12);
-        const rising = delta > tolerance;
-        const falling = delta < -tolerance;
+        if (previous) {
+          const delta = point.p - previous.p;
+          const tolerance = Math.max(Math.abs(previous.p) * 1e-10, 1e-12);
+          if (delta > tolerance) volumeDirection = 1;
+          else if (delta < -tolerance) volumeDirection = -1;
+        }
+
         const barHeight = volumeH * (point.v / maxVolume);
-        ctx.fillStyle = rising ? "rgba(21,154,104,.28)" : falling ? "rgba(217,75,75,.24)" : "rgba(115,130,125,.20)";
+        ctx.fillStyle = volumeDirection > 0
+          ? "rgba(21,154,104,.28)"
+          : "rgba(217,75,75,.24)";
         ctx.fillRect(point.x - barWidth/2, volumeBase - barHeight, barWidth, barHeight);
       });
 
@@ -1843,19 +1855,25 @@
       ctx.fillStyle = areaGradient;
       ctx.fill();
 
-      // Red/green line segments.
+      // Red/green line segments. Flat intervals retain the last market direction.
       ctx.lineWidth = 2.35*dpr;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
+      let lineDirection = 1;
+
       for (let index = 1; index < plotted.length; index++) {
         const previous = plotted[index - 1];
         const current = plotted[index];
+        const delta = current.p - previous.p;
+        const tolerance = Math.max(Math.abs(previous.p) * 1e-10, 1e-12);
+
+        if (delta > tolerance) lineDirection = 1;
+        else if (delta < -tolerance) lineDirection = -1;
+
         ctx.beginPath();
         ctx.moveTo(previous.x, previous.y);
         ctx.lineTo(current.x, current.y);
-        const delta = current.p - previous.p;
-        const tolerance = Math.max(Math.abs(previous.p) * 1e-10, 1e-12);
-        ctx.strokeStyle = Math.abs(delta) <= tolerance ? "#73827D" : delta > 0 ? "#0E9B68" : "#D94C4C";
+        ctx.strokeStyle = lineDirection > 0 ? "#0E9B68" : "#D94C4C";
         ctx.stroke();
       }
 
@@ -1971,7 +1989,7 @@
       if ($("#chartMaxLabel")) $("#chartMaxLabel").textContent = lang === "ru" ? "Максимум" : "High";
       if ($("#chartLastLabel")) $("#chartLastLabel").textContent = lang === "ru" ? "Последняя цена" : "Last price";
       if ($("#chartVolumeLabel")) $("#chartVolumeLabel").textContent = lang === "ru" ? "Объём периода" : "Period volume";
-      if ($("#chartSource")) $("#chartSource").textContent = lang === "ru" ? "Источник: GeckoTerminal / QuickSwap · пустые интервалы заполнены последней ценой" : "Source: GeckoTerminal / QuickSwap · empty intervals carry forward the last price";
+      if ($("#chartSource")) $("#chartSource").textContent = lang === "ru" ? "Источник: GeckoTerminal / QuickSwap" : "Source: GeckoTerminal / QuickSwap";
       const periodNames = {"8h":lang === "ru" ? "8 ч." : "8h", "24h":lang === "ru" ? "24 ч." : "24h", "7d":lang === "ru" ? "7 дней" : "7 days"};
       $$(".chart-period-btn").forEach(button => button.textContent = periodNames[button.dataset.period] || button.textContent);
       if (priceHistory.length > 1) drawPriceChart();
