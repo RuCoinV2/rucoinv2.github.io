@@ -6,6 +6,8 @@
 <meta content="Официальный сайт RuCoin (RUS) в сети Polygon: актуальный курс к USDT и рублю, онлайн-конвертер, график, ликвидность, объём торгов и проверенный адрес контракта." name="description"/>
 <meta content="#071A16" name="theme-color"/>
 <meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
+<meta content="strict-origin-when-cross-origin" name="referrer"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.dexscreener.com https://api.geckoterminal.com https://api.coingecko.com; upgrade-insecure-requests">
 <link href="https://rucoinv2.com/" rel="canonical"/>
 <link href="/favicon.ico" rel="icon" sizes="any"/>
 <link href="/assets/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
@@ -1359,12 +1361,70 @@
 
     let currentLang = "ru";
     let latestMarket = null;
+    let marketRequestPromise = null;
+
+    const MARKET_CACHE_KEY = "rucoin_market_v2";
+    const FX_CACHE_KEY = "rucoin_usdt_rub_v2";
+    const MARKET_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
+    const FX_CACHE_MAX_AGE = 12 * 60 * 60 * 1000;
 
     const $ = (selector) => document.querySelector(selector);
     const $$ = (selector) => document.querySelectorAll(selector);
 
     function configuredLink(url) {
       return url && url !== "#" ? url : "#";
+    }
+
+    function writeCache(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.warn("Local cache write failed:", error);
+      }
+    }
+
+    function readCache(key, maxAgeMs) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const value = JSON.parse(raw);
+        const savedAt = Number(value?.savedAt);
+        if (!Number.isFinite(savedAt) || Date.now() - savedAt > maxAgeMs) {
+          localStorage.removeItem(key);
+          return null;
+        }
+        return value;
+      } catch (error) {
+        console.warn("Local cache read failed:", error);
+        return null;
+      }
+    }
+
+    function formatUpdateDate(timestamp) {
+      return new Date(timestamp).toLocaleString(
+        currentLang === "ru" ? "ru-RU" : "en-US",
+        { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }
+      );
+    }
+
+    function restoreCachedData() {
+      const cachedMarket = readCache(MARKET_CACHE_KEY, MARKET_CACHE_MAX_AGE);
+      if (cachedMarket && Number.isFinite(Number(cachedMarket.price))) {
+        renderMarket({
+          price: Number(cachedMarket.price),
+          liquidity: Number(cachedMarket.liquidity),
+          volume24h: Number(cachedMarket.volume24h),
+          source: cachedMarket.source || "Cache",
+          fetchedAt: Number(cachedMarket.savedAt),
+          isCached: true
+        });
+      }
+
+      const cachedFx = readCache(FX_CACHE_KEY, FX_CACHE_MAX_AGE);
+      if (cachedFx && Number.isFinite(Number(cachedFx.rate))) {
+        usdtRubRate = Number(cachedFx.rate);
+        updateConverter();
+      }
     }
 
     function applyConfig() {
@@ -1417,7 +1477,10 @@
     function renderMarket(data) {
       if (!data) return;
 
-      latestMarket = data;
+      const fetchedAt = Number(data.fetchedAt) || Date.now();
+      const isCached = Boolean(data.isCached);
+      latestMarket = { ...data, fetchedAt, isCached };
+
       const price = Number(data.price);
       const liquidity = Number(data.liquidity);
       const volume24h = Number(data.volume24h);
@@ -1428,29 +1491,52 @@
       $("#statVolumeValue").textContent = formatUsd(volume24h);
       $("#poolText").textContent = PROJECT_CONFIG.pairAddress;
 
-      const time = new Date().toLocaleTimeString(
-        currentLang === "ru" ? "ru-RU" : "en-US",
-        { hour: "2-digit", minute: "2-digit" }
-      );
+      if (!isCached) {
+        writeCache(MARKET_CACHE_KEY, {
+          price,
+          liquidity,
+          volume24h,
+          source: data.source || "DEX",
+          savedAt: fetchedAt
+        });
+      }
+
+      updateConverter();
+      stampCourseUpdate(fetchedAt, isCached);
 
       const sourceName = data.source || "DEX";
-      updateConverter();
-      stampCourseUpdate();
+      const updateLabel = formatUpdateDate(fetchedAt);
 
-      $("#marketStatus").textContent = currentLang === "ru"
-        ? `Данные ${sourceName} обновлены в ${time}. Следующее обновление через 60 секунд.`
-        : `${sourceName} data updated at ${time}. Next update in 60 seconds.`;
+      if (isCached) {
+        $("#marketStatus").textContent = currentLang === "ru"
+          ? `Последние доступные данные: ${updateLabel}. Проверяем обновление…`
+          : `Last available data: ${updateLabel}. Checking for an update…`;
+      } else {
+        $("#marketStatus").textContent = currentLang === "ru"
+          ? `Данные ${sourceName} обновлены: ${updateLabel}.`
+          : `${sourceName} data updated: ${updateLabel}.`;
+      }
     }
 
     function showMarketError() {
+      if (latestMarket) {
+        const timestamp = Number(latestMarket.fetchedAt) || Date.now();
+        $("#marketStatus").textContent = currentLang === "ru"
+          ? `Свежие данные временно недоступны. Показаны последние доступные данные от ${formatUpdateDate(timestamp)}.`
+          : `Fresh data is temporarily unavailable. Showing the last available data from ${formatUpdateDate(timestamp)}.`;
+        return;
+      }
+
       $("#badgePrice").textContent = "—";
       $("#statCurrentPriceValue").textContent = "—";
       $("#statLiquidityValue").textContent = "—";
       $("#statVolumeValue").textContent = "—";
-      $("#marketStatus").textContent = currentLang === "ru" ? "Не удалось получить данные из двух источников. Сайт повторит запрос автоматически через 60 секунд." : "Both market-data sources are temporarily unavailable. The website will retry in 60 seconds.";
+      $("#marketStatus").textContent = currentLang === "ru"
+        ? "Рыночные данные временно недоступны. Повторная попытка через 60 секунд."
+        : "Market data is temporarily unavailable. Retrying in 60 seconds.";
     }
 
-    async function fetchJson(url, timeoutMs = 10000) {
+    async function fetchJson(url, timeoutMs = 4500) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -1531,25 +1617,37 @@
     }
 
     async function updateMarketData() {
-      $("#marketStatus").textContent = currentLang === "ru"
-        ? "Обновление рыночных данных…"
-        : "Updating market data…";
+      if (marketRequestPromise) return marketRequestPromise;
 
-      try {
-        let data;
+      $("#marketStatus").textContent = latestMarket
+        ? (currentLang === "ru" ? "Проверяем свежую цену…" : "Checking the latest price…")
+        : (currentLang === "ru" ? "Загрузка рыночных данных…" : "Loading market data…");
 
+      marketRequestPromise = (async () => {
         try {
-          data = await loadFromDexScreener();
-        } catch (dexError) {
-          console.warn("DEX Screener request failed, using GeckoTerminal:", dexError);
-          data = await loadFromGeckoTerminal();
-        }
+          // Both sources start at the same time. The first valid answer is shown.
+          const data = await Promise.any([
+            loadFromDexScreener(),
+            loadFromGeckoTerminal()
+          ]);
 
-        renderMarket(data);
-      } catch (error) {
-        console.error("RuCoin market-data update failed:", error);
-        showMarketError();
-      }
+          renderMarket({
+            ...data,
+            fetchedAt: Date.now(),
+            isCached: false
+          });
+
+          return data;
+        } catch (error) {
+          console.error("RuCoin market-data update failed:", error);
+          showMarketError();
+          throw error;
+        } finally {
+          marketRequestPromise = null;
+        }
+      })();
+
+      return marketRequestPromise;
     }
 
 
@@ -1576,13 +1674,23 @@
 
     async function loadUsdtRub() {
       try {
-        const payload = await fetchJson(PROJECT_CONFIG.usdtRubApi, 12000);
+        const payload = await fetchJson(PROJECT_CONFIG.usdtRubApi, 5000);
         const rate = Number(payload?.tether?.rub);
         if (!Number.isFinite(rate)) throw new Error("USDT/RUB unavailable");
+
         usdtRubRate = rate;
+        writeCache(FX_CACHE_KEY, { rate, savedAt: Date.now() });
       } catch (error) {
         console.warn("USDT/RUB request failed:", error);
+
+        if (!Number.isFinite(usdtRubRate)) {
+          const cachedFx = readCache(FX_CACHE_KEY, FX_CACHE_MAX_AGE);
+          if (cachedFx && Number.isFinite(Number(cachedFx.rate))) {
+            usdtRubRate = Number(cachedFx.rate);
+          }
+        }
       }
+
       updateConverter();
     }
 
@@ -1979,10 +2087,20 @@
       dot.style.display = "block";
     }
 
-    function stampCourseUpdate() {
-      const el=$("#courseUpdated"); if(!el) return;
-      const now=new Date().toLocaleString(currentLang==="ru"?"ru-RU":"en-US",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
-      el.textContent=currentLang==="ru"?`Обновлено: ${now}`:`Updated: ${now}`;
+    function stampCourseUpdate(timestamp = Date.now(), isCached = false) {
+      const el = $("#courseUpdated");
+      if (!el) return;
+
+      const formatted = formatUpdateDate(timestamp);
+      if (isCached) {
+        el.textContent = currentLang === "ru"
+          ? `Последние данные: ${formatted}`
+          : `Last data: ${formatted}`;
+      } else {
+        el.textContent = currentLang === "ru"
+          ? `Обновлено: ${formatted}`
+          : `Updated: ${formatted}`;
+      }
     }
 
     function setLanguage(lang) {
@@ -2072,11 +2190,14 @@
 
     $("#year").textContent = new Date().getFullYear();
     applyConfig();
+    restoreCachedData();
     setLanguage("ru");
-    updateMarketData();
+
+    // Fresh requests run in the background. Cached values remain visible.
+    updateMarketData().catch(() => {});
     loadUsdtRub();
     loadPriceHistory("8h");
-    setInterval(updateMarketData, PROJECT_CONFIG.refreshMs);
+    setInterval(() => updateMarketData().catch(() => {}), PROJECT_CONFIG.refreshMs);
     setInterval(() => loadPriceHistory(activeChartPeriod), 5 * 60 * 1000);
     setInterval(loadUsdtRub, 5 * 60 * 1000);
   </script>
