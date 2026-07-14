@@ -949,7 +949,7 @@
   <div class="chart-metric"><small id="chartLastLabel">Последняя цена</small><strong id="chartLast">—</strong></div>
   <div class="chart-metric"><small id="chartVolumeLabel">Объём периода</small><strong id="chartVolume">—</strong></div>
 </div>
-<div class="chart-source"><span id="chartSource">Источник: GeckoTerminal / QuickSwap</span><span id="chartUpdated">—</span></div>
+<div class="chart-source"><span id="chartSource">Источник: GeckoTerminal / QuickSwap · пустые интервалы заполнены последней ценой</span><span id="chartUpdated">—</span></div>
 </div>
 </div>
 <div class="official-strip">
@@ -1591,7 +1591,7 @@
 
       activeChartPeriod = period;
       const cfg = CHART_PERIODS[period] || CHART_PERIODS["8h"];
-      const url = `${PROJECT_CONFIG.ohlcvBase}/${cfg.path}?aggregate=${cfg.aggregate}&limit=${cfg.limit}&currency=usd`;
+      const url = `${PROJECT_CONFIG.ohlcvBase}/${cfg.path}?aggregate=${cfg.aggregate}&limit=${cfg.limit}&currency=usd&include_empty_intervals=true`;
 
       $$(".chart-period-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.period === activeChartPeriod));
       if ($("#chartPeriodLabel")) $("#chartPeriodLabel").textContent = currentLang === "ru" ? cfg.ru : cfg.en;
@@ -1616,12 +1616,42 @@
         });
 
         const sorted = [...deduplicated.values()].sort((a, b) => a.t - b.t);
-        if (sorted.length < 2) throw new Error("Not enough OHLCV points");
+        if (!sorted.length) throw new Error("Not enough OHLCV points");
 
-        const newestTimestamp = sorted[sorted.length - 1].t;
-        const cutoff = newestTimestamp - cfg.seconds - bucketSeconds;
-        priceHistory = sorted.filter(point => point.t >= cutoff);
-        if (priceHistory.length < 2) priceHistory = sorted.slice(-2);
+        // Build a continuous time series up to the current candle.
+        // Intervals without trades keep the previous close and use zero volume.
+        const currentBucket = Math.floor(Date.now() / 1000 / bucketSeconds) * bucketSeconds;
+        const rangeStart = currentBucket - cfg.seconds;
+
+        const sourceByTime = new Map(sorted.map(point => [point.t, point]));
+        const pointBeforeRange = [...sorted].reverse().find(point => point.t <= rangeStart);
+        const firstPointInOrAfterRange = sorted.find(point => point.t >= rangeStart);
+        const marketPrice = Number(latestMarket?.price);
+
+        let lastKnownPrice =
+          pointBeforeRange?.p ??
+          firstPointInOrAfterRange?.p ??
+          (Number.isFinite(marketPrice) ? marketPrice : sorted[0].p);
+
+        const continuous = [];
+        for (let timestamp = rangeStart; timestamp <= currentBucket; timestamp += bucketSeconds) {
+          const realPoint = sourceByTime.get(timestamp);
+
+          if (realPoint && Number.isFinite(realPoint.p)) {
+            lastKnownPrice = realPoint.p;
+            continuous.push({ t: timestamp, p: lastKnownPrice, v: Math.max(0, realPoint.v || 0), real: true });
+          } else {
+            continuous.push({ t: timestamp, p: lastKnownPrice, v: 0, real: false });
+          }
+        }
+
+        // Keep the final displayed value synchronized with the live pool price.
+        if (continuous.length && Number.isFinite(marketPrice)) {
+          continuous[continuous.length - 1].p = marketPrice;
+        }
+
+        priceHistory = continuous;
+        if (priceHistory.length < 2) throw new Error("Not enough continuous OHLCV points");
 
         drawPriceChart();
         fallback.style.display = "none";
@@ -1792,9 +1822,12 @@
       const barWidth = Math.max(2*dpr, Math.min(10*dpr, plotW * candleSeconds / Math.max(1, range.end - range.start) * .68));
       plotted.forEach((point, index) => {
         const previous = plotted[index - 1];
-        const rising = !previous || point.p >= previous.p;
+        const delta = previous ? point.p - previous.p : 0;
+        const tolerance = Math.max(Math.abs(previous?.p || point.p) * 1e-10, 1e-12);
+        const rising = delta > tolerance;
+        const falling = delta < -tolerance;
         const barHeight = volumeH * (point.v / maxVolume);
-        ctx.fillStyle = rising ? "rgba(21,154,104,.28)" : "rgba(217,75,75,.24)";
+        ctx.fillStyle = rising ? "rgba(21,154,104,.28)" : falling ? "rgba(217,75,75,.24)" : "rgba(115,130,125,.20)";
         ctx.fillRect(point.x - barWidth/2, volumeBase - barHeight, barWidth, barHeight);
       });
 
@@ -1820,7 +1853,9 @@
         ctx.beginPath();
         ctx.moveTo(previous.x, previous.y);
         ctx.lineTo(current.x, current.y);
-        ctx.strokeStyle = current.p >= previous.p ? "#0E9B68" : "#D94C4C";
+        const delta = current.p - previous.p;
+        const tolerance = Math.max(Math.abs(previous.p) * 1e-10, 1e-12);
+        ctx.strokeStyle = Math.abs(delta) <= tolerance ? "#73827D" : delta > 0 ? "#0E9B68" : "#D94C4C";
         ctx.stroke();
       }
 
@@ -1936,7 +1971,7 @@
       if ($("#chartMaxLabel")) $("#chartMaxLabel").textContent = lang === "ru" ? "Максимум" : "High";
       if ($("#chartLastLabel")) $("#chartLastLabel").textContent = lang === "ru" ? "Последняя цена" : "Last price";
       if ($("#chartVolumeLabel")) $("#chartVolumeLabel").textContent = lang === "ru" ? "Объём периода" : "Period volume";
-      if ($("#chartSource")) $("#chartSource").textContent = lang === "ru" ? "Источник: GeckoTerminal / QuickSwap" : "Source: GeckoTerminal / QuickSwap";
+      if ($("#chartSource")) $("#chartSource").textContent = lang === "ru" ? "Источник: GeckoTerminal / QuickSwap · пустые интервалы заполнены последней ценой" : "Source: GeckoTerminal / QuickSwap · empty intervals carry forward the last price";
       const periodNames = {"8h":lang === "ru" ? "8 ч." : "8h", "24h":lang === "ru" ? "24 ч." : "24h", "7d":lang === "ru" ? "7 дней" : "7 days"};
       $$(".chart-period-btn").forEach(button => button.textContent = periodNames[button.dataset.period] || button.textContent);
       if (priceHistory.length > 1) drawPriceChart();
