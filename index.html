@@ -828,7 +828,7 @@
 .official-strip p{margin:5px 0 0;color:var(--muted);font-size:14px}
 .official-strip code{overflow-wrap:anywhere;color:var(--gold-light);font-size:12px}
 @media(max-width:920px){.course-grid{grid-template-columns:1fr}.official-strip{grid-template-columns:1fr}.chart-surface{height:390px}}
-@media(max-width:560px){.converter-card{padding:19px}.conversion-result span{font-size:24px}.amount-field input{font-size:26px}.official-strip{padding:18px}.chart-toolbar,.chart-quote{padding-left:17px;padding-right:17px}.chart-periods{padding-left:17px;padding-right:17px}.chart-surface{height:335px;margin-left:10px;margin-right:10px;border-radius:15px}.chart-price strong{font-size:29px}.chart-live{padding:6px 8px}.chart-metrics{grid-template-columns:1fr 1fr;margin-left:10px;margin-right:10px}.chart-source{display:block;padding-left:11px;padding-right:11px}.chart-source span{display:block;margin-top:4px}.chart-x-axis{font-size:9px}.chart-metric strong{font-size:12px}}
+@media(max-width:560px){.converter-card{padding:19px}.conversion-result span{font-size:24px}.amount-field input{font-size:26px}.official-strip{padding:18px}.chart-toolbar,.chart-quote{padding-left:17px;padding-right:17px}.chart-periods{padding-left:17px;padding-right:17px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.chart-period-btn{padding:0 4px;font-size:11.5px;min-width:0}.chart-surface{height:335px;margin-left:10px;margin-right:10px;border-radius:15px}.chart-price strong{font-size:29px}.chart-live{padding:6px 8px}.chart-metrics{grid-template-columns:1fr 1fr;margin-left:10px;margin-right:10px}.chart-source{display:block;padding-left:11px;padding-right:11px}.chart-source span{display:block;margin-top:4px}.chart-x-axis{font-size:9px}.chart-metric strong{font-size:12px}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://rucoinv2.com/#website", "url": "https://rucoinv2.com/", "name": "RuCoin", "alternateName": ["RuCoin Official", "RuCoin RUS", "Официальный сайт RuCoin"], "inLanguage": ["ru", "en"]}, {"@type": "Organization", "@id": "https://rucoinv2.com/#organization", "name": "RuCoin", "url": "https://rucoinv2.com/", "logo": {"@type": "ImageObject", "url": "https://rucoinv2.com/assets/rucoin-logo-512.png", "width": 512, "height": 512}, "sameAs": ["https://t.me/RuCoinV2", "https://polygonscan.com/token/0x5cd963dE59Bd5399AC6CE7a4eB3D4dc8a73bCFd9", "https://dexscreener.com/polygon/0x55ab79065c70daed7d241e1d5a8fa88074e139a5"]}, {"@type": "FinancialProduct", "@id": "https://rucoinv2.com/#token", "name": "RuCoin", "alternateName": "RUS", "description": "Цифровой актив RuCoin (RUS) в сети Polygon.", "url": "https://rucoinv2.com/", "provider": {"@id": "https://rucoinv2.com/#organization"}}]}</script></head>
 <body><noscript><div style="padding:14px;text-align:center;background:#C9A34E;color:#13211D">Для загрузки онлайн-курса RuCoin включите JavaScript.</div></noscript>
@@ -932,6 +932,7 @@
   <button class="chart-period-btn active" data-period="8h" type="button">8 ч.</button>
   <button class="chart-period-btn" data-period="24h" type="button">24 ч.</button>
   <button class="chart-period-btn" data-period="7d" type="button">7 дней</button>
+  <button class="chart-period-btn" data-period="30d" type="button">1 мес.</button>
 </div>
 <div class="chart-surface" id="chartSurface">
   <canvas aria-label="Биржевой график курса RuCoin" id="priceChartCanvas"></canvas>
@@ -1559,7 +1560,8 @@
     const CHART_PERIODS = {
       "8h":  { path:"minute", aggregate:15, limit:40, seconds:8*3600, step:3600,  ru:"За 8 часов",  en:"8-hour change" },
       "24h": { path:"hour", aggregate:1, limit:30, seconds:24*3600, step:4*3600, ru:"За 24 часа", en:"24-hour change" },
-      "7d":  { path:"hour", aggregate:4, limit:48, seconds:7*86400, step:86400, ru:"За 7 дней", en:"7-day change" }
+      "7d":  { path:"hour", aggregate:4, limit:48, seconds:7*86400, step:86400, ru:"За 7 дней", en:"7-day change" },
+      "30d": { path:"day", aggregate:1, limit:35, seconds:30*86400, step:5*86400, ru:"За 1 месяц", en:"1-month change" }
     };
 
     function updateConverter() {
@@ -1601,7 +1603,11 @@
         const rows = payload?.data?.attributes?.ohlcv_list;
         if (!Array.isArray(rows)) throw new Error("OHLCV unavailable");
 
-        const bucketSeconds = cfg.path === "minute" ? cfg.aggregate * 60 : cfg.aggregate * 3600;
+        const bucketSeconds = cfg.path === "minute"
+          ? cfg.aggregate * 60
+          : cfg.path === "day"
+            ? cfg.aggregate * 86400
+            : cfg.aggregate * 3600;
         const deduplicated = new Map();
 
         rows.forEach(row => {
@@ -1683,7 +1689,7 @@
 
     function chartTimeLabel(timestamp, compact = false) {
       const date = new Date(timestamp * 1000);
-      if (activeChartPeriod === "7d") {
+      if (activeChartPeriod === "7d" || activeChartPeriod === "30d") {
         return date.toLocaleDateString(currentLang === "ru" ? "ru-RU" : "en-US", {day:"2-digit",month:"2-digit"});
       }
       if (compact) {
@@ -1822,11 +1828,14 @@
       }));
 
       // Volume bars.
-      const candleSeconds = CHART_PERIODS[activeChartPeriod].path === "minute"
-        ? CHART_PERIODS[activeChartPeriod].aggregate * 60
-        : CHART_PERIODS[activeChartPeriod].aggregate * 3600;
+      const activePeriodConfig = CHART_PERIODS[activeChartPeriod];
+      const candleSeconds = activePeriodConfig.path === "minute"
+        ? activePeriodConfig.aggregate * 60
+        : activePeriodConfig.path === "day"
+          ? activePeriodConfig.aggregate * 86400
+          : activePeriodConfig.aggregate * 3600;
       const barWidth = Math.max(2*dpr, Math.min(10*dpr, plotW * candleSeconds / Math.max(1, range.end - range.start) * .68));
-      let volumeDirection = 1;
+      let volumeDirection = prices[prices.length - 1] >= prices[0] ? 1 : -1;
       plotted.forEach((point, index) => {
         const previous = plotted[index - 1];
         if (previous) {
@@ -1859,7 +1868,7 @@
       ctx.lineWidth = 2.35*dpr;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      let lineDirection = 1;
+      let lineDirection = prices[prices.length - 1] >= prices[0] ? 1 : -1;
 
       for (let index = 1; index < plotted.length; index++) {
         const previous = plotted[index - 1];
@@ -1880,12 +1889,13 @@
       const firstPrice = prices[0];
       const lastPrice = prices[prices.length - 1];
       const change = (lastPrice / firstPrice - 1) * 100;
+      const trendIsUp = change >= 0;
       const lastY = yForPrice(lastPrice);
 
       // Current-price guide.
       ctx.save();
       ctx.setLineDash([5*dpr, 4*dpr]);
-      ctx.strokeStyle = change >= 0 ? "rgba(14,139,98,.72)" : "rgba(201,63,63,.72)";
+      ctx.strokeStyle = trendIsUp ? "rgba(14,139,98,.72)" : "rgba(201,63,63,.72)";
       ctx.beginPath();
       ctx.moveTo(pad.left, lastY);
       ctx.lineTo(w - pad.right, lastY);
@@ -1896,7 +1906,7 @@
       const lastPoint = plotted[plotted.length - 1];
       ctx.beginPath();
       ctx.arc(lastPoint.x, lastPoint.y, 3.2*dpr, 0, Math.PI*2);
-      ctx.fillStyle = change >= 0 ? "#0E9B68" : "#D94C4C";
+      ctx.fillStyle = trendIsUp ? "#0E9B68" : "#D94C4C";
       ctx.fill();
       ctx.lineWidth = 2*dpr;
       ctx.strokeStyle = "#FFFFFF";
@@ -1908,15 +1918,15 @@
       if (priceBadge) {
         priceBadge.textContent = chartPriceNumber(lastPrice);
         priceBadge.style.top = `${lastY / dpr}px`;
-        priceBadge.style.background = change >= 0 ? "#0E6B55" : "#B84444";
+        priceBadge.style.background = trendIsUp ? "#0E6B55" : "#B84444";
         priceBadge.style.display = "block";
       }
 
       const totalVolume = volumes.reduce((sum, value) => sum + value, 0);
       if ($("#chartHeaderPrice")) $("#chartHeaderPrice").textContent = chartPriceNumber(lastPrice);
       if ($("#chartChange")) {
-        $("#chartChange").textContent = `${change >= 0 ? "+" : ""}${localNumber(change, 2)}%`;
-        $("#chartChange").style.color = change >= 0 ? "#6DDBAE" : "#F09A9A";
+        $("#chartChange").textContent = `${trendIsUp ? "+" : ""}${localNumber(change, 2)}%`;
+        $("#chartChange").style.color = trendIsUp ? "#6DDBAE" : "#F09A9A";
       }
       if ($("#chartMin")) $("#chartMin").textContent = chartPrice(rawMin);
       if ($("#chartMax")) $("#chartMax").textContent = chartPrice(rawMax);
@@ -1990,7 +2000,12 @@
       if ($("#chartLastLabel")) $("#chartLastLabel").textContent = lang === "ru" ? "Последняя цена" : "Last price";
       if ($("#chartVolumeLabel")) $("#chartVolumeLabel").textContent = lang === "ru" ? "Объём периода" : "Period volume";
       if ($("#chartSource")) $("#chartSource").textContent = lang === "ru" ? "Источник: GeckoTerminal / QuickSwap" : "Source: GeckoTerminal / QuickSwap";
-      const periodNames = {"8h":lang === "ru" ? "8 ч." : "8h", "24h":lang === "ru" ? "24 ч." : "24h", "7d":lang === "ru" ? "7 дней" : "7 days"};
+      const periodNames = {
+        "8h": lang === "ru" ? "8 ч." : "8h",
+        "24h": lang === "ru" ? "24 ч." : "24h",
+        "7d": lang === "ru" ? "7 дней" : "7 days",
+        "30d": lang === "ru" ? "1 мес." : "1 month"
+      };
       $$(".chart-period-btn").forEach(button => button.textContent = periodNames[button.dataset.period] || button.textContent);
       if (priceHistory.length > 1) drawPriceChart();
       document.title = lang === "ru"
