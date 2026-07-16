@@ -302,9 +302,9 @@
       position: relative;
       display: grid;
       align-items: center;
-      justify-items: end;
+      justify-items: center;
       min-height: 470px;
-      padding-right: 4px;
+      padding-right: 0;
     }
 
     .coin-glow {
@@ -334,8 +334,10 @@
     .mini-badge {
       max-width: calc(100% - 24px);
       position: absolute;
-      right: 0;
-      bottom: 10%;
+      left: 50%;
+      right: auto;
+      bottom: 9%;
+      transform: translateX(12%);
       min-width: 180px;
       padding: 16px 18px;
       background: rgba(11,43,35,.84);
@@ -771,6 +773,10 @@
         gap: 24px;
       }
 
+      .mini-badge {
+        transform: translateX(8%);
+      }
+
       .hero-logo {
         width: min(320px, 76%);
       }
@@ -1022,8 +1028,9 @@
         width: min(100%, 285px);
         min-width: 0;
         max-width: 100%;
-        right: 50%;
-        transform: translateX(50%);
+        left: auto;
+        right: auto;
+        transform: none;
       }
 
       .stats,
