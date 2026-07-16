@@ -752,6 +752,15 @@
       opacity: 1;
     }
 
+
+    @media (min-width: 901px) {
+      .header .nav {
+        width: min(calc(100% - 96px), var(--max));
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
     @media (max-width: 980px) {
       .nav-links { display: none; }
       .mobile-toggle { display: inline-flex; }
@@ -847,7 +856,7 @@
       }
 
       .hero {
-        padding-top: 56px;
+        padding-top: 46px;
       }
 
       .hero-copy {
@@ -861,24 +870,32 @@
       .hero h1 {
         width: 100%;
         max-width: 100%;
-        font-size: clamp(43px, 10.7vw, 60px);
-        line-height: .98;
-        letter-spacing: -0.045em;
+        font-size: clamp(32px, 8.6vw, 38px);
+        line-height: 1.04;
+        letter-spacing: -0.035em;
         text-wrap: balance;
-        overflow-wrap: anywhere;
+        overflow-wrap: normal;
         word-break: normal;
-        hyphens: manual;
-        -webkit-hyphens: manual;
+        hyphens: none;
+        -webkit-hyphens: none;
       }
 
       .hero h1 .gold {
         display: block;
       }
 
+      .eyebrow {
+        max-width: 100%;
+        padding: 8px 11px;
+        font-size: 11px;
+        letter-spacing: .08em;
+      }
+
       .hero-lead {
         padding-left: 8px;
         padding-right: 8px;
-        line-height: 1.55;
+        font-size: 17px;
+        line-height: 1.5;
       }
 
       .container {
@@ -908,7 +925,9 @@
       }
 
       .brand img {
-        flex: 0 0 42px;
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
       }
 
       .brand span {
@@ -939,7 +958,10 @@
 
       .lang-switch,
       .mobile-toggle {
-        flex: 0 0 46px;
+        width: 42px;
+        min-width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
       }
 
       h1,
@@ -970,7 +992,7 @@
       }
 
       .hero-logo {
-        width: min(300px, 100%);
+        width: min(255px, 78vw);
         max-width: 100%;
       }
 
@@ -1070,8 +1092,8 @@
 .official-strip code{overflow-wrap:anywhere;color:var(--gold-light);font-size:12px}
 @media(max-width:920px){.course-grid{grid-template-columns:1fr}.official-strip{grid-template-columns:1fr}.chart-surface{height:390px}}
 @media(max-width:560px){
-.nav .lang-switch,.nav .mobile-toggle{width:44px;min-width:44px;padding:0}
-.hero h1{font-size:clamp(42px,10.5vw,56px);line-height:.99;letter-spacing:-.04em}
+.nav .lang-switch,.nav .mobile-toggle{width:42px;min-width:42px;height:42px;padding:0}
+.hero h1{font-size:clamp(31px,8.4vw,36px);line-height:1.05;letter-spacing:-.03em}
 .chart-toolbar,.chart-quote{min-width:0}
 .chart-symbol,.chart-price,.chart-change{min-width:0}
 .converter-card{padding:19px}.conversion-result span{font-size:24px}.amount-field input{font-size:26px}.official-strip{padding:18px}.chart-toolbar,.chart-quote{padding-left:17px;padding-right:17px}.chart-periods{padding-left:17px;padding-right:17px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.chart-period-btn{padding:0 4px;font-size:11.5px;min-width:0}.chart-surface{height:335px;margin-left:10px;margin-right:10px;border-radius:15px}.chart-price strong{font-size:29px}.chart-live{padding:6px 8px}.chart-metrics{grid-template-columns:1fr 1fr;margin-left:10px;margin-right:10px}.chart-source{display:block;padding-left:11px;padding-right:11px}.chart-source span{display:block;margin-top:4px}.chart-x-axis{font-size:9px}.chart-metric strong{font-size:12px}}
@@ -1108,7 +1130,7 @@
 <span data-i18n="eyebrow">Цифровой актив в сети Polygon</span>
 </div>
 <h1>
-<span data-i18n="heroTitleA">Децентрализо&shy;ванная ценность.</span><br/>
+<span data-i18n="heroTitleA">Децентрализованная ценность.</span><br/>
 <span class="gold-text" data-i18n="heroTitleB">Предсказуемая цена.</span>
 </h1>
 <p class="hero-lead" data-i18n="heroLead">
@@ -1508,7 +1530,7 @@
       ru: {
         navCourse:"Курс", navAbout:"О проекте", navStability:"Стабильность", navTransparency:"Прозрачность", navToken:"Токен", navRoadmap:"План",
         buyRUS:"Купить RUS", courseKicker:"Онлайн-курс", courseTitle:"Курс RuCoin сегодня", courseIntro:"Рыночная цена официального пула RUS/USDT на QuickSwap с пересчётом в российские рубли.", verifiedToken:"Официальный RuCoin • Polygon", amountLabel:"Количество RuCoin", usdtRubRate:"Курс USDT к рублю", refresh:"Обновить", priceChart:"График RUS/USDT", last24h:"Последние 24 часа", chartFallback:"Не удалось загрузить историю цены. Повторите попытку через несколько секунд.", officialIdentity:"Как отличить официальный RuCoin", officialIdentityText:"Проверяйте одновременно логотип, сеть Polygon, тикер RUS и адрес контракта.", eyebrow:"Цифровой актив в сети Polygon",
-        heroTitleA:"Децентрализо\u00ADванная ценность.", heroTitleB:"Предсказуемая цена.",
+        heroTitleA:"Децентрализованная ценность.", heroTitleB:"Предсказуемая цена.",
         heroLead:"RuCoin — цифровой актив, разработанный для поддержания целевой рыночной цены 0,10 USDT за 1 RUS с помощью прозрачной ликвидности в блокчейне и автоматизированного механизма стабилизации.",
         buyQuickSwap:"Купить на QuickSwap", viewContract:"Открыть контракт",
         heroRisk:"Целевая цена не является гарантией. Операции с цифровыми активами связаны с риском.",
