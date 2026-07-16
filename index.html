@@ -51,7 +51,42 @@
     }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+
+    html {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
+    }
+
+    main,
+    header,
+    footer,
+    section,
+    .container {
+      max-width: 100%;
+    }
+
+    .nav,
+    .hero,
+    .hero > *,
+    .course-grid,
+    .course-grid > *,
+    .transparency-layout,
+    .transparency-layout > *,
+    .footer-grid,
+    .footer-grid > * {
+      min-width: 0;
+    }
+
     body {
       margin: 0;
       background:
@@ -66,7 +101,21 @@
 
     a { color: inherit; text-decoration: none; }
     button, input { font: inherit; }
-    img { max-width: 100%; display: block; }
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    code,
+    pre,
+    .detail-value,
+    .official-strip code,
+    .token-row > div,
+    .market-status {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
 
     .container {
       width: min(calc(100% - 36px), var(--max));
@@ -83,6 +132,8 @@
     }
 
     .nav {
+      width: 100%;
+      max-width: 100%;
       min-height: 76px;
       display: flex;
       align-items: center;
@@ -91,6 +142,8 @@
     }
 
     .brand {
+      min-width: 0;
+      flex: 0 1 auto;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -115,6 +168,8 @@
     .nav-links a:hover { color: var(--text); }
 
     .nav-actions {
+      min-width: 0;
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -173,6 +228,8 @@
     }
 
     .hero {
+      width: 100%;
+      max-width: 100%;
       min-height: 710px;
       display: grid;
       grid-template-columns: 1.08fr .92fr;
@@ -223,6 +280,8 @@
     }
 
     .hero-actions {
+      width: 100%;
+      max-width: 100%;
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
@@ -236,6 +295,8 @@
     }
 
     .hero-visual {
+      width: 100%;
+      max-width: 100%;
       position: relative;
       display: grid;
       place-items: center;
@@ -252,7 +313,8 @@
 
     .hero-logo {
       position: relative;
-      width: min(450px, 88vw);
+      width: min(450px, 100%);
+      max-width: 100%;
       border-radius: 34px;
       box-shadow: 0 30px 75px rgba(0,0,0,.34);
       filter: drop-shadow(0 26px 50px rgba(0,0,0,.28));
@@ -266,6 +328,7 @@
     }
 
     .mini-badge {
+      max-width: calc(100% - 24px);
       position: absolute;
       right: 2%;
       bottom: 12%;
@@ -290,6 +353,8 @@
     }
 
     .stats {
+      width: 100%;
+      max-width: 100%;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       border: 1px solid var(--line);
@@ -765,11 +830,185 @@
       }
       .footer-grid { grid-template-columns: 1fr; }
     }
-  
+
+    @media (max-width: 640px) {
+      body {
+        position: relative;
+      }
+
+      .header {
+        padding-left: max(14px, env(safe-area-inset-left));
+        padding-right: max(14px, env(safe-area-inset-right));
+      }
+
+      .nav {
+        padding-left: 4px;
+        padding-right: 4px;
+      }
+
+      .hero {
+        padding-top: 56px;
+      }
+
+      .hero-copy {
+        width: 100%;
+        max-width: 100%;
+        padding-left: 10px;
+        padding-right: 10px;
+        overflow: visible;
+      }
+
+      .hero h1 {
+        width: 100%;
+        max-width: 100%;
+        font-size: clamp(43px, 10.7vw, 60px);
+        line-height: .98;
+        letter-spacing: -0.045em;
+        text-wrap: balance;
+        overflow-wrap: anywhere;
+        word-break: normal;
+        hyphens: manual;
+        -webkit-hyphens: manual;
+      }
+
+      .hero h1 .gold {
+        display: block;
+      }
+
+      .hero-lead {
+        padding-left: 8px;
+        padding-right: 8px;
+        line-height: 1.55;
+      }
+
+      .container {
+        width: calc(100% - 24px);
+        max-width: calc(100% - 24px);
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .header,
+      .nav,
+      main,
+      section,
+      footer {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .nav {
+        gap: 10px;
+      }
+
+      .brand {
+        gap: 10px;
+        overflow: hidden;
+        padding-left: 2px;
+      }
+
+      .brand img {
+        flex: 0 0 42px;
+      }
+
+      .brand span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .nav-actions {
+        gap: 10px;
+        padding-right: 2px;
+      }
+
+      .nav-menu {
+        width: calc(100% + 28px);
+        max-width: calc(100% + 28px);
+        margin-left: -14px;
+        margin-right: -14px;
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .nav-menu a {
+        display: block;
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .lang-switch,
+      .mobile-toggle {
+        flex: 0 0 46px;
+      }
+
+      h1,
+      .hero-lead,
+      .risk-note,
+      .section-title,
+      .section-intro {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions .btn {
+        width: 100%;
+        max-width: 100%;
+        padding-left: 14px;
+        padding-right: 14px;
+        white-space: normal;
+        text-align: center;
+      }
+
+      .hero-visual {
+        overflow: hidden;
+      }
+
+      .hero-logo {
+        width: min(300px, 100%);
+        max-width: 100%;
+      }
+
+      .mini-badge {
+        width: min(100%, 310px);
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .stats,
+      .card,
+      .step,
+      .tokenomics,
+      .risk-box,
+      .converter-card,
+      .chart-card,
+      .official-strip {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .detail-row {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .notice {
+        width: calc(100% - 24px);
+        max-width: calc(100% - 24px);
+        text-align: center;
+        white-space: normal;
+      }
+    }
+
 
 .course-section{padding-top:82px}
-.course-grid{display:grid;grid-template-columns:minmax(310px,.78fr) minmax(0,1.22fr);gap:18px;margin-top:38px;align-items:start}
-.converter-card,.chart-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.018));box-shadow:var(--shadow)}
+.course-grid{width:100%;max-width:100%;display:grid;grid-template-columns:minmax(310px,.78fr) minmax(0,1.22fr);gap:18px;margin-top:38px;align-items:start}
+.converter-card,.chart-card{width:100%;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.018));box-shadow:var(--shadow)}
 .converter-card{padding:26px}
 .verified-line{display:flex;align-items:center;gap:10px;color:#BEEBDD;font-size:13px;font-weight:750;margin-bottom:24px}
 .verified-line img{width:32px;height:32px;border-radius:8px}
@@ -786,7 +1025,7 @@
 .rate-row strong{color:var(--text)}
 
 .chart-card{overflow:hidden;padding:0}
-.chart-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:23px 24px 0}
+.chart-toolbar{width:100%;max-width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:23px 24px 0}
 .chart-symbol{display:flex;align-items:center;gap:11px;min-width:0}
 .chart-symbol img{width:38px;height:38px;border-radius:11px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
 .chart-symbol strong{display:block;font-size:19px;letter-spacing:-.02em}
@@ -794,7 +1033,7 @@
 .chart-live{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid rgba(88,207,157,.2);border-radius:999px;background:rgba(40,174,119,.08);color:#9CE1C2;font-size:11px;font-weight:850;letter-spacing:.08em}
 .chart-live::before{content:"";width:7px;height:7px;border-radius:50%;background:#38C986;box-shadow:0 0 0 5px rgba(56,201,134,.11);animation:livePulse 1.8s ease-in-out infinite}
 @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.42}}
-.chart-quote{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:20px 24px 0}
+.chart-quote{width:100%;max-width:100%;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:20px 24px 0}
 .chart-price{display:flex;align-items:baseline;gap:8px;min-width:0}
 .chart-price strong{font-size:clamp(29px,4vw,40px);line-height:1;font-weight:820;letter-spacing:-.04em;white-space:nowrap}
 .chart-price small{color:var(--muted);font-size:12px;font-weight:750}
@@ -830,7 +1069,12 @@
 .official-strip p{margin:5px 0 0;color:var(--muted);font-size:14px}
 .official-strip code{overflow-wrap:anywhere;color:var(--gold-light);font-size:12px}
 @media(max-width:920px){.course-grid{grid-template-columns:1fr}.official-strip{grid-template-columns:1fr}.chart-surface{height:390px}}
-@media(max-width:560px){.converter-card{padding:19px}.conversion-result span{font-size:24px}.amount-field input{font-size:26px}.official-strip{padding:18px}.chart-toolbar,.chart-quote{padding-left:17px;padding-right:17px}.chart-periods{padding-left:17px;padding-right:17px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.chart-period-btn{padding:0 4px;font-size:11.5px;min-width:0}.chart-surface{height:335px;margin-left:10px;margin-right:10px;border-radius:15px}.chart-price strong{font-size:29px}.chart-live{padding:6px 8px}.chart-metrics{grid-template-columns:1fr 1fr;margin-left:10px;margin-right:10px}.chart-source{display:block;padding-left:11px;padding-right:11px}.chart-source span{display:block;margin-top:4px}.chart-x-axis{font-size:9px}.chart-metric strong{font-size:12px}}
+@media(max-width:560px){
+.nav .lang-switch,.nav .mobile-toggle{width:44px;min-width:44px;padding:0}
+.hero h1{font-size:clamp(42px,10.5vw,56px);line-height:.99;letter-spacing:-.04em}
+.chart-toolbar,.chart-quote{min-width:0}
+.chart-symbol,.chart-price,.chart-change{min-width:0}
+.converter-card{padding:19px}.conversion-result span{font-size:24px}.amount-field input{font-size:26px}.official-strip{padding:18px}.chart-toolbar,.chart-quote{padding-left:17px;padding-right:17px}.chart-periods{padding-left:17px;padding-right:17px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.chart-period-btn{padding:0 4px;font-size:11.5px;min-width:0}.chart-surface{height:335px;margin-left:10px;margin-right:10px;border-radius:15px}.chart-price strong{font-size:29px}.chart-live{padding:6px 8px}.chart-metrics{grid-template-columns:1fr 1fr;margin-left:10px;margin-right:10px}.chart-source{display:block;padding-left:11px;padding-right:11px}.chart-source span{display:block;margin-top:4px}.chart-x-axis{font-size:9px}.chart-metric strong{font-size:12px}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://rucoinv2.com/#website", "url": "https://rucoinv2.com/", "name": "RuCoin", "alternateName": ["RuCoin Official", "RuCoin RUS", "Официальный сайт RuCoin"], "inLanguage": ["ru", "en"]}, {"@type": "Organization", "@id": "https://rucoinv2.com/#organization", "name": "RuCoin", "url": "https://rucoinv2.com/", "logo": {"@type": "ImageObject", "url": "https://rucoinv2.com/assets/rucoin-logo-512.png", "width": 512, "height": 512}, "sameAs": ["https://t.me/RuCoinV2", "https://polygonscan.com/token/0x5cd963dE59Bd5399AC6CE7a4eB3D4dc8a73bCFd9", "https://dexscreener.com/polygon/0x55ab79065c70daed7d241e1d5a8fa88074e139a5"]}, {"@type": "FinancialProduct", "@id": "https://rucoinv2.com/#token", "name": "RuCoin", "alternateName": "RUS", "description": "Цифровой актив RuCoin (RUS) в сети Polygon.", "url": "https://rucoinv2.com/", "provider": {"@id": "https://rucoinv2.com/#organization"}}]}</script></head>
 <body><noscript><div style="padding:14px;text-align:center;background:#C9A34E;color:#13211D">Для загрузки онлайн-курса RuCoin включите JavaScript.</div></noscript>
@@ -864,7 +1108,7 @@
 <span data-i18n="eyebrow">Цифровой актив в сети Polygon</span>
 </div>
 <h1>
-<span data-i18n="heroTitleA">Децентрализованная ценность.</span><br/>
+<span data-i18n="heroTitleA">Децентрализо&shy;ванная ценность.</span><br/>
 <span class="gold-text" data-i18n="heroTitleB">Предсказуемая цена.</span>
 </h1>
 <p class="hero-lead" data-i18n="heroLead">
@@ -1264,7 +1508,7 @@
       ru: {
         navCourse:"Курс", navAbout:"О проекте", navStability:"Стабильность", navTransparency:"Прозрачность", navToken:"Токен", navRoadmap:"План",
         buyRUS:"Купить RUS", courseKicker:"Онлайн-курс", courseTitle:"Курс RuCoin сегодня", courseIntro:"Рыночная цена официального пула RUS/USDT на QuickSwap с пересчётом в российские рубли.", verifiedToken:"Официальный RuCoin • Polygon", amountLabel:"Количество RuCoin", usdtRubRate:"Курс USDT к рублю", refresh:"Обновить", priceChart:"График RUS/USDT", last24h:"Последние 24 часа", chartFallback:"Не удалось загрузить историю цены. Повторите попытку через несколько секунд.", officialIdentity:"Как отличить официальный RuCoin", officialIdentityText:"Проверяйте одновременно логотип, сеть Polygon, тикер RUS и адрес контракта.", eyebrow:"Цифровой актив в сети Polygon",
-        heroTitleA:"Децентрализованная ценность.", heroTitleB:"Предсказуемая цена.",
+        heroTitleA:"Децентрализо\u00ADванная ценность.", heroTitleB:"Предсказуемая цена.",
         heroLead:"RuCoin — цифровой актив, разработанный для поддержания целевой рыночной цены 0,10 USDT за 1 RUS с помощью прозрачной ликвидности в блокчейне и автоматизированного механизма стабилизации.",
         buyQuickSwap:"Купить на QuickSwap", viewContract:"Открыть контракт",
         heroRisk:"Целевая цена не является гарантией. Операции с цифровыми активами связаны с риском.",
